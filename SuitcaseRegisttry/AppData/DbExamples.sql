@@ -1,27 +1,48 @@
--- Примеры простых запросов после обновления структуры.
+-- Простые SQL-запросы для курсового проекта "Реестр чемоданов"
+-- Работаем с существующей структурой БД SuitcaseRegistry.
 
--- 1) Список чемоданов пассажира + статус + рейс.
-SELECT s.IDSuitcase,
-       s.QRKod,
-       st.Name AS SuitcaseStatus,
-       f.DestinationPortal,
-       f.DateTime
+-- 1) Вход: найти пользователя по ФИО и роли.
+SELECT TOP 1 u.IDUser, u.FIO, r.Name AS RoleName
+FROM [User] u
+JOIN Roles r ON r.IDRoles = u.IDRoles
+WHERE u.FIO = @Fio
+  AND r.Name = @RoleName;
+
+-- 2) Пассажир добавляет чемодан (INSERT в Suitcase).
+INSERT INTO Suitcase (QRKod, Owner, Model, Colour, Weight, IDDegreeDanger, IDStatys, DateReg, Last_Up, Features)
+VALUES (@QRKod, @Owner, @Model, @Colour, @Weight, @IDDegreeDanger, @IDStatys, GETDATE(), GETDATE(), @Features);
+
+-- 3) Пассажир смотрит свои чемоданы (WHERE Owner = user).
+SELECT s.IDSuitcase, s.QRKod, s.Model, s.Colour, s.Weight, st.Name AS SuitcaseStatus
 FROM Suitcase s
 LEFT JOIN Statys st ON st.IDStatys = s.IDStatys
-LEFT JOIN Flight f ON f.IDFlight = s.CurrentFlightId
+WHERE s.Owner = @Owner
 ORDER BY s.DateReg DESC;
 
--- 2) Если чемодан опасный, отправляем на досмотр.
+-- 4) Инспектор делает досмотр (INSERT в Inspection).
+INSERT INTO Inspection (IDSuitcase, Inspector, [Date], IDResult, [Description])
+VALUES (@IDSuitcase, @Inspector, GETDATE(), @IDResult, @Description);
+
+-- 5) Инспектор конфискует предмет (INSERT в ConfiscatedItem).
+INSERT INTO ConfiscatedItem (IDSuitcase, Inspector, Subject, DateConfiscation)
+VALUES (@IDSuitcase, @Inspector, @Subject, GETDATE());
+
+-- 6) Инспектор меняет статус чемодана (UPDATE Suitcase).
 UPDATE Suitcase
-SET IDStatys = (SELECT TOP 1 IDStatys FROM Statys WHERE Name = N'На досмотре'),
+SET IDStatys = @NewStatus,
     Last_Up = GETDATE()
-WHERE IDSuitcase = @SuitcaseId
-  AND (SignDanger = N'Опасно' OR Weight > 30);
+WHERE IDSuitcase = @IDSuitcase;
 
--- 3) Если произошёл побег, создаём INCIDENT.
-INSERT INTO Incident (IDSuitcase, IDFlight, [Date], [Place], [Description], IDStatysTypeIncident, IncidentCode)
-VALUES (@SuitcaseId, @FlightId, GETDATE(), N'Зона контроля', N'Побег чемодана', 1, N'ESCAPE');
+-- 7) Логист ищет потерянные чемоданы.
+SELECT s.IDSuitcase, s.QRKod, s.Owner, st.Name AS SuitcaseStatus
+FROM Suitcase s
+JOIN Statys st ON st.IDStatys = s.IDStatys
+WHERE st.Name LIKE N'%Потер%';
 
--- 4) Запись в простой трекинг-таймлайн.
-INSERT INTO Tracking (IDSuitcase, IDFlight, [Time], EventText)
-VALUES (@SuitcaseId, @FlightId, GETDATE(), N'Чемодан передан инспектору на досмотр');
+-- 8) Логист обновляет Tracking.
+INSERT INTO Tracking (IDSuitcase, IDFlight, Coordinate, IDStatysTracking, [Time])
+VALUES (@IDSuitcase, @IDFlight, @Coordinate, @IDStatysTracking, GETDATE());
+
+-- 9) При проблеме добавляем Incident.
+INSERT INTO Incident (IDSuitcase, IDTypeIncident, [Date], [Place], [Description], IDStatysTypeIncident)
+VALUES (@IDSuitcase, @IDTypeIncident, GETDATE(), @Place, @Description, @IDStatysTypeIncident);
