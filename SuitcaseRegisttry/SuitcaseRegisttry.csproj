@@ -200,6 +200,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="AppData\DbExamples.sql" />
+    <None Include="AppData\DbUpdate_Minimal.sql" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\travel_journey-16_icon-icons.com_56000.ico" />
