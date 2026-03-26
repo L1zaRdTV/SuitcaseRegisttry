@@ -18,6 +18,7 @@ namespace SuitcaseRegisttry.Pages
         public Autorizaiton()
         {
             InitializeComponent();
+            SetUiForRole(null);
         }
 
         private SuitcaseRegistryEntities2 Db => AppConnect.Modelo11;
@@ -37,16 +38,35 @@ namespace SuitcaseRegisttry.Pages
                 return;
             }
 
-            _currentRole = ((ComboBoxItem)cbRole.SelectedItem).Content.ToString();
-            _currentUser = GetOrCreateUser(fio, _currentRole);
+            var password = pbPassword.Password.Trim();
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show("Введите пароль.");
+                return;
+            }
+
+            _currentUser = Db.User
+                .Include(u => u.Roles)
+                .FirstOrDefault(u => u.FIO == fio && u.Token == password);
+
+            if (_currentUser == null)
+            {
+                MessageBox.Show("Пользователь с таким ФИО и паролем не найден в базе данных SuitcaseRegistry.");
+                return;
+            }
+
+            _currentRole = _currentUser.Roles != null ? _currentUser.Roles.Name : string.Empty;
+            if (string.IsNullOrWhiteSpace(_currentRole))
+            {
+                MessageBox.Show("Для пользователя не назначена роль.");
+                return;
+            }
 
             txtCurrentUser.Text = $"Авторизован: {_currentUser.FIO} ({_currentRole})";
             txtWelcome.Text = $"Здравствуйте, {_currentUser.FIO}!";
             txtTicket.Text = $"Номер билета: {(_currentUser.NumberTicet.HasValue ? _currentUser.NumberTicet.Value.ToString() : "не назначен")}";
 
-            PassengerTab.Visibility = _currentRole == "Passenger" ? Visibility.Visible : Visibility.Collapsed;
-            InspectorTab.Visibility = _currentRole == "Inspector" ? Visibility.Visible : Visibility.Collapsed;
-            LogisticTab.Visibility = _currentRole == "Logistician" ? Visibility.Visible : Visibility.Collapsed;
+            SetUiForRole(_currentRole);
 
             LoadPassengerSuitcases();
             LoadPassengerIncidents();
@@ -56,8 +76,24 @@ namespace SuitcaseRegisttry.Pages
             LoadLogisticTimeline();
         }
 
-        private User GetOrCreateUser(string fio, string roleName)
+        private void BtnRegister_Click(object sender, RoutedEventArgs e)
         {
+            if (Db == null)
+            {
+                MessageBox.Show("Нет подключения к SQL Server.");
+                return;
+            }
+
+            var fio = txtLoginName.Text.Trim();
+            var password = pbPassword.Password.Trim();
+            var roleName = ((ComboBoxItem)cbRole.SelectedItem).Content.ToString();
+
+            if (string.IsNullOrWhiteSpace(fio) || string.IsNullOrWhiteSpace(password))
+            {
+                MessageBox.Show("Для регистрации заполните ФИО и пароль.");
+                return;
+            }
+
             var roleId = Db.Roles.Where(r => r.Name == roleName).Select(r => r.IDRoles).FirstOrDefault();
             if (roleId == 0)
             {
@@ -67,23 +103,37 @@ namespace SuitcaseRegisttry.Pages
                 roleId = role.IDRoles;
             }
 
-            var user = Db.User.FirstOrDefault(u => u.FIO == fio && u.IDRoles == roleId);
-            if (user != null)
+            var existingUser = Db.User.FirstOrDefault(u => u.FIO == fio && u.IDRoles == roleId);
+            if (existingUser != null)
             {
-                return user;
+                MessageBox.Show("Пользователь с таким ФИО и ролью уже существует. Используйте вход.");
+                return;
             }
 
-            user = new User
+            var user = new User
             {
                 FIO = fio,
                 IDRoles = roleId,
                 DateReg = DateTime.Now,
-                Token = Guid.NewGuid().ToString("N"),
+                Token = password,
                 NumberTicet = new Random().Next(10000, 99999)
             };
             Db.User.Add(user);
             Db.SaveChanges();
-            return user;
+
+            MessageBox.Show("Регистрация выполнена. Теперь выполните вход по ФИО и паролю.");
+        }
+
+        private void BtnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            _currentUser = null;
+            _currentRole = null;
+            pbPassword.Password = string.Empty;
+            txtCurrentUser.Text = "Авторизация не выполнена";
+            txtWelcome.Text = "Добро пожаловать!";
+            txtTicket.Text = "Номер билета: -";
+            ClearDataViews();
+            SetUiForRole(null);
         }
 
         private void add_suitcase(int ownerId, string model, string colour, int weight, int dangerDegree)
@@ -248,6 +298,11 @@ namespace SuitcaseRegisttry.Pages
             {
                 return;
             }
+            if (_currentRole != "Inspector")
+            {
+                MessageBox.Show("Эта операция доступна только роли Inspector.");
+                return;
+            }
 
             var selected = dgInspector.SelectedItem as SuitcaseGridItem;
             if (selected == null)
@@ -268,6 +323,11 @@ namespace SuitcaseRegisttry.Pages
             {
                 return;
             }
+            if (_currentRole != "Inspector")
+            {
+                MessageBox.Show("Эта операция доступна только роли Inspector.");
+                return;
+            }
 
             var selected = dgInspector.SelectedItem as SuitcaseGridItem;
             if (selected == null)
@@ -286,12 +346,22 @@ namespace SuitcaseRegisttry.Pages
 
         private void BtnSearchLost_Click(object sender, RoutedEventArgs e)
         {
+            if (_currentRole != "Logistician")
+            {
+                MessageBox.Show("Эта операция доступна только роли Logistician.");
+                return;
+            }
             LoadLostSuitcases(txtSearchLost.Text.Trim());
         }
 
         private void BtnUpdateTracking_Click(object sender, RoutedEventArgs e)
         {
             var selected = dgLost.SelectedItem as SuitcaseGridItem;
+            if (_currentRole != "Logistician")
+            {
+                MessageBox.Show("Эта операция доступна только роли Logistician.");
+                return;
+            }
             if (selected == null)
             {
                 MessageBox.Show("Выберите чемодан.");
@@ -312,6 +382,11 @@ namespace SuitcaseRegisttry.Pages
         private void BtnAddIncident_Click(object sender, RoutedEventArgs e)
         {
             var selected = dgLost.SelectedItem as SuitcaseGridItem;
+            if (_currentRole != "Logistician")
+            {
+                MessageBox.Show("Эта операция доступна только роли Logistician.");
+                return;
+            }
             if (selected == null)
             {
                 MessageBox.Show("Выберите чемодан.");
@@ -501,6 +576,24 @@ namespace SuitcaseRegisttry.Pages
             }
 
             return lbPassengerSuitcases.SelectedItem as SuitcaseGridItem;
+        }
+
+        private void SetUiForRole(string role)
+        {
+            PassengerTab.Visibility = role == "Passenger" ? Visibility.Visible : Visibility.Collapsed;
+            InspectorTab.Visibility = role == "Inspector" ? Visibility.Visible : Visibility.Collapsed;
+            LogisticTab.Visibility = role == "Logistician" ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void ClearDataViews()
+        {
+            lbPassengerSuitcases.ItemsSource = null;
+            lbPassengerIncidents.ItemsSource = null;
+            lbPassengerTrack.ItemsSource = null;
+            dgInspector.ItemsSource = null;
+            lbInspectorJournal.ItemsSource = null;
+            dgLost.ItemsSource = null;
+            lbLogisticTimeline.ItemsSource = null;
         }
 
         private int GetStatusId(string statusName, int fallback = 1)

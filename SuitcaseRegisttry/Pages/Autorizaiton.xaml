@@ -66,16 +66,23 @@
                 </StackPanel>
 
                 <Border Grid.Column="1" Background="#1F2E56" CornerRadius="12" Padding="10">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="ФИО:" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                        <TextBox x:Name="txtLoginName" Width="170" Margin="0,0,8,0"/>
-                        <TextBlock Text="Роль:" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                        <ComboBox x:Name="cbRole" Width="140" Margin="0,0,8,0">
-                            <ComboBoxItem Content="Passenger" IsSelected="True"/>
-                            <ComboBoxItem Content="Inspector"/>
-                            <ComboBoxItem Content="Logistician"/>
-                        </ComboBox>
-                        <Button Content="Войти" Style="{StaticResource PrimaryButton}" Click="BtnLogin_Click" Margin="0"/>
+                    <StackPanel>
+                        <TextBlock Text="Вход выполняется только через данные из DATABASE SuitcaseRegistry" Foreground="#C8D4F2" FontSize="12" Margin="0,0,0,8"/>
+                        <WrapPanel VerticalAlignment="Center">
+                            <TextBlock Text="ФИО:" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox x:Name="txtLoginName" Width="170" Margin="0,0,8,8"/>
+                            <TextBlock Text="Пароль:" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <PasswordBox x:Name="pbPassword" Width="140" Margin="0,0,8,8"/>
+                            <TextBlock Text="Роль (для регистрации):" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <ComboBox x:Name="cbRole" Width="140" Margin="0,0,8,8">
+                                <ComboBoxItem Content="Passenger" IsSelected="True"/>
+                                <ComboBoxItem Content="Inspector"/>
+                                <ComboBoxItem Content="Logistician"/>
+                            </ComboBox>
+                            <Button Content="Войти" Style="{StaticResource PrimaryButton}" Click="BtnLogin_Click"/>
+                            <Button Content="Регистрация" Style="{StaticResource GhostButton}" Click="BtnRegister_Click"/>
+                            <Button Content="Выйти" Style="{StaticResource GhostButton}" Click="BtnLogout_Click" Margin="0,0,0,8"/>
+                        </WrapPanel>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -109,10 +116,14 @@
                             <Border Style="{StaticResource CardBorder}">
                                 <StackPanel>
                                     <TextBlock Text="Зарегистрировать новый чемодан" Style="{StaticResource HeaderText}" FontSize="17" Margin="0,0,0,10"/>
-                                    <TextBox x:Name="txtModel" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" ToolTip="Модель"/>
-                                    <TextBox x:Name="txtColour" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" ToolTip="Цвет"/>
-                                    <TextBox x:Name="txtWeight" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" ToolTip="Вес"/>
-                                    <TextBox x:Name="txtDanger" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" ToolTip="Уровень опасности"/>
+                                    <TextBlock Text="Модель чемодана"/>
+                                    <TextBox x:Name="txtModel" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center"/>
+                                    <TextBlock Text="Цвет"/>
+                                    <TextBox x:Name="txtColour" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center"/>
+                                    <TextBlock Text="Вес (кг)"/>
+                                    <TextBox x:Name="txtWeight" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center"/>
+                                    <TextBlock Text="Уровень опасности (1-5)"/>
+                                    <TextBox x:Name="txtDanger" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center"/>
                                     <Button Content="Зарегистрировать новый чемодан" Style="{StaticResource PrimaryButton}" Click="BtnAddSuitcase_Click"/>
                                     <Button Content="Отследить выбранный" Style="{StaticResource GhostButton}" Click="BtnTrackPassenger_Click"/>
                                     <Button Content="Сообщить о проблеме" Style="{StaticResource GhostButton}" Click="BtnPassengerReportProblem_Click"/>
@@ -205,7 +216,8 @@
                                 <StackPanel>
                                     <TextBlock Text="Рабочие действия" Style="{StaticResource HeaderText}" FontSize="16" Margin="0,0,0,8"/>
                                     <Button Content="Начать досмотр" Style="{StaticResource PrimaryButton}" Click="BtnInspect_Click"/>
-                                    <TextBox x:Name="txtConfiscateSubject" Height="32" Margin="0,0,0,8" VerticalContentAlignment="Center" ToolTip="Что конфисковать"/>
+                                    <TextBlock Text="Что конфисковать"/>
+                                    <TextBox x:Name="txtConfiscateSubject" Height="32" Margin="0,0,0,8" VerticalContentAlignment="Center"/>
                                     <Button Content="Конфисковать предмет" Style="{StaticResource GhostButton}" Click="BtnConfiscate_Click"/>
                                 </StackPanel>
                             </Border>
@@ -231,7 +243,8 @@
                             <StackPanel>
                                 <TextBlock Text="Поиск и сопровождение потерянного багажа" Style="{StaticResource HeaderText}" FontSize="17" Margin="0,0,0,8"/>
                                 <WrapPanel Margin="0,0,0,8">
-                                    <TextBox x:Name="txtSearchLost" Width="240" Height="32" Margin="0,0,8,8" VerticalContentAlignment="Center" ToolTip="Поиск по QR"/>
+                                    <TextBlock Text="Поиск по QR:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox x:Name="txtSearchLost" Width="240" Height="32" Margin="0,0,8,8" VerticalContentAlignment="Center"/>
                                     <Button Content="Поиск" Style="{StaticResource GhostButton}" Click="BtnSearchLost_Click"/>
                                 </WrapPanel>
                                 <DataGrid x:Name="dgLost" AutoGenerateColumns="False" IsReadOnly="True" Height="430">
@@ -250,7 +263,8 @@
                             <Border Style="{StaticResource CardBorder}">
                                 <StackPanel>
                                     <TextBlock Text="Управление трекингом" Style="{StaticResource HeaderText}" FontSize="16" Margin="0,0,0,8"/>
-                                    <TextBox x:Name="txtCoordinate" Height="32" Margin="0,0,0,8" VerticalContentAlignment="Center" ToolTip="Новое местоположение"/>
+                                    <TextBlock Text="Новое местоположение"/>
+                                    <TextBox x:Name="txtCoordinate" Height="32" Margin="0,0,0,8" VerticalContentAlignment="Center"/>
                                     <Button Content="Обновить местоположение" Style="{StaticResource PrimaryButton}" Click="BtnUpdateTracking_Click"/>
                                     <Button Content="Записать инцидент" Style="{StaticResource GhostButton}" Click="BtnAddIncident_Click"/>
                                 </StackPanel>
