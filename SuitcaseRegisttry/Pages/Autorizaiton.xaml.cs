@@ -1,7 +1,10 @@
 ﻿using SuitcaseRegisttry.AppData;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace SuitcaseRegisttry.Pages
 {
@@ -14,9 +17,14 @@ namespace SuitcaseRegisttry.Pages
         private const int StatusInspection = 2;
         private const int StatusApproved = 3;
 
+        private readonly List<SuitcaseViewItem> _suitcases = new List<SuitcaseViewItem>();
+        private readonly List<TrackingViewItem> _tracking = new List<TrackingViewItem>();
+
         public Autorizaiton()
         {
             InitializeComponent();
+            LoadDemoData();
+            RefreshTables();
         }
 
         private void BtnCheckSuitcase_Click(object sender, RoutedEventArgs e)
@@ -36,9 +44,23 @@ namespace SuitcaseRegisttry.Pages
                 Weight = cbDangerous.IsChecked == true ? 36 : 18
             };
 
-            ProcessSuitcase(suitcase);
+            ProcessSuitcase(suitcase, cbEscape.IsChecked == true);
 
+            var viewItem = new SuitcaseViewItem
+            {
+                QrKod = suitcase.QRKod,
+                FlightCode = txtFlight.Text.Trim(),
+                StatusId = suitcase.IDStatys ?? StatusRegistered,
+                IsDangerous = suitcase.SignDanger == "Опасно",
+                DangerText = suitcase.SignDanger
+            };
+            viewItem.UpdateStatusVisual();
+            _suitcases.Insert(0, viewItem);
+
+            AddTracking($"{viewItem.QrKod}: статус изменён на '{viewItem.StatusText}'");
             txtStatus.Text = $"Статус: {GetStatusName(suitcase.IDStatys)}";
+
+            RefreshTables();
         }
 
         private bool ValidateInput()
@@ -64,7 +86,7 @@ namespace SuitcaseRegisttry.Pages
             return true;
         }
 
-        private void ProcessSuitcase(Suitcase suitcase)
+        private void ProcessSuitcase(Suitcase suitcase, bool isEscape)
         {
             if (suitcase == null)
             {
@@ -77,21 +99,32 @@ namespace SuitcaseRegisttry.Pages
             if (isDangerous || isOverweight)
             {
                 suitcase.IDStatys = StatusInspection;
-                CreateIncident(suitcase, isDangerous, isOverweight);
+                CreateIncident(suitcase, isDangerous, isOverweight, false);
             }
             else
             {
                 suitcase.IDStatys = StatusApproved;
             }
 
+            if (isEscape)
+            {
+                suitcase.IDStatys = StatusInspection;
+                CreateIncident(suitcase, false, false, true);
+                AddTracking($"{suitcase.QRKod}: событие 'Побег'. Создан INCIDENT");
+            }
+
             suitcase.Last_Up = DateTime.Now;
         }
 
-        private void CreateIncident(Suitcase suitcase, bool isDangerous, bool isOverweight)
+        private void CreateIncident(Suitcase suitcase, bool isDangerous, bool isOverweight, bool isEscape)
         {
-            string description;
+            var description = "";
 
-            if (isDangerous && isOverweight)
+            if (isEscape)
+            {
+                description = "Побег чемодана из зоны контроля.";
+            }
+            else if (isDangerous && isOverweight)
             {
                 description = "Опасный и слишком тяжелый чемодан.";
             }
@@ -99,7 +132,7 @@ namespace SuitcaseRegisttry.Pages
             {
                 description = "Опасные признаки в чемодане.";
             }
-            else
+            else if (isOverweight)
             {
                 description = "Превышение веса чемодана.";
             }
@@ -133,6 +166,104 @@ namespace SuitcaseRegisttry.Pages
                 default:
                     return "Неизвестно";
             }
+        }
+
+        private void BtnTrack_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = dgPassenger.SelectedItem as SuitcaseViewItem;
+            if (selected == null)
+            {
+                MessageBox.Show("Выбери чемодан в таблице пассажира.", "Трекинг", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            AddTracking($"Отследить: {selected.QrKod}, рейс {selected.FlightCode}, статус {selected.StatusText}");
+            RefreshTables();
+        }
+
+        private void AddTracking(string description)
+        {
+            _tracking.Insert(0, new TrackingViewItem
+            {
+                TimeText = DateTime.Now.ToString("dd.MM.yyyy HH:mm"),
+                Description = description
+            });
+        }
+
+        private void LoadDemoData()
+        {
+            _suitcases.Add(new SuitcaseViewItem
+            {
+                QrKod = "QR-100501",
+                FlightCode = "MSK-77",
+                StatusId = StatusApproved,
+                IsDangerous = false,
+                DangerText = "Норма"
+            });
+            _suitcases.Add(new SuitcaseViewItem
+            {
+                QrKod = "QR-100777",
+                FlightCode = "KZN-12",
+                StatusId = StatusInspection,
+                IsDangerous = true,
+                DangerText = "Опасно"
+            });
+
+            foreach (var item in _suitcases)
+            {
+                item.UpdateStatusVisual();
+            }
+
+            AddTracking("QR-100501: прибыл в пункт досмотра");
+            AddTracking("QR-100777: отправлен инспектору");
+        }
+
+        private void RefreshTables()
+        {
+            dgPassenger.ItemsSource = null;
+            dgPassenger.ItemsSource = _suitcases;
+
+            dgInspector.ItemsSource = null;
+            dgInspector.ItemsSource = _suitcases;
+
+            lbTracking.ItemsSource = null;
+            lbTracking.ItemsSource = _tracking;
+        }
+
+        private class SuitcaseViewItem
+        {
+            public string QrKod { get; set; }
+            public string FlightCode { get; set; }
+            public int StatusId { get; set; }
+            public string StatusText { get; set; }
+            public Brush StatusColor { get; set; }
+            public bool IsDangerous { get; set; }
+            public string DangerText { get; set; }
+
+            public void UpdateStatusVisual()
+            {
+                switch (StatusId)
+                {
+                    case StatusInspection:
+                        StatusText = "На досмотре";
+                        StatusColor = Brushes.IndianRed;
+                        break;
+                    case StatusApproved:
+                        StatusText = "Допущен";
+                        StatusColor = Brushes.SeaGreen;
+                        break;
+                    default:
+                        StatusText = "Зарегистрирован";
+                        StatusColor = Brushes.SteelBlue;
+                        break;
+                }
+            }
+        }
+
+        private class TrackingViewItem
+        {
+            public string TimeText { get; set; }
+            public string Description { get; set; }
         }
     }
 }

@@ -8,33 +8,107 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Авторизация">
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="White"/>
-                <GradientStop Color="#FF8030E6" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="320">
-            <TextBlock Text="Реестр чемоданов" FontSize="28" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Franklin Gothic Heavy"/>
-            <TextBlock Text="АВТОРИЗАЦИЯ" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,20" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Franklin Gothic Heavy"/>
+    <Grid Background="#F5F6FA">
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="#2F6FED"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="Margin" Value="0,5,0,0"/>
+            </Style>
+        </Grid.Resources>
 
-            <TextBlock Text="ФИО:" FontSize="14" Margin="5,0,5,5" FontFamily="Franklin Gothic Heavy"/>
-            <TextBox x:Name="txtFIO" Margin="0,0,0,8"/>
+        <TabControl Margin="14">
+            <TabItem Header="Регистрация">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10" Width="360">
+                        <TextBlock Text="Реестр чемоданов" FontSize="24" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock Text="Быстрая проверка багажа" FontSize="15" Margin="0,0,0,12"/>
 
-            <TextBlock Text="Роль:" FontSize="14" Margin="5,0,5,5" FontFamily="Franklin Gothic Heavy"/>
-            <TextBox x:Name="txtRoles" Margin="0,0,0,8"/>
+                        <TextBlock Text="ФИО" FontWeight="Bold"/>
+                        <TextBox x:Name="txtFIO" Margin="0,3,0,8"/>
 
-            <TextBlock Text="Email:" FontSize="14" Margin="5,0,5,5" FontFamily="Franklin Gothic Heavy"/>
-            <TextBox x:Name="txtEmail" Margin="0,0,0,8"/>
+                        <TextBlock Text="Роль" FontWeight="Bold"/>
+                        <TextBox x:Name="txtRoles" Margin="0,3,0,8"/>
 
-            <TextBlock Text="Номер рейса:" FontSize="14" Margin="5,0,5,5" FontFamily="Franklin Gothic Heavy"/>
-            <TextBox x:Name="txtFlight" Margin="0,0,0,8"/>
+                        <TextBlock Text="Email" FontWeight="Bold"/>
+                        <TextBox x:Name="txtEmail" Margin="0,3,0,8"/>
 
-            <CheckBox x:Name="cbDangerous" Content="Есть опасные признаки" Margin="0,0,0,12" FontWeight="Bold"/>
+                        <TextBlock Text="Номер рейса" FontWeight="Bold"/>
+                        <TextBox x:Name="txtFlight" Margin="0,3,0,8"/>
 
-            <Button Content="Проверить чемодан" Height="32" Click="BtnCheckSuitcase_Click"/>
-            <TextBlock x:Name="txtStatus" Margin="0,12,0,0" FontWeight="Bold" TextWrapping="Wrap"/>
-        </StackPanel>
+                        <CheckBox x:Name="cbDangerous" Content="Есть опасные признаки" Margin="0,0,0,6"/>
+                        <CheckBox x:Name="cbEscape" Content="Событие: Побег" Margin="0,0,0,10"/>
+
+                        <Button Content="Проверить чемодан" Height="32" Click="BtnCheckSuitcase_Click"/>
+                        <TextBlock x:Name="txtStatus" Margin="0,12,0,0" FontWeight="Bold" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Пассажир">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid x:Name="dgPassenger" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" Grid.Row="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="QR" Binding="{Binding QrKod}" Width="*"/>
+                            <DataGridTextColumn Header="Рейс" Binding="{Binding FlightCode}" Width="100"/>
+                            <DataGridTextColumn Header="Статус" Binding="{Binding StatusText}" Width="160"/>
+                            <DataGridTemplateColumn Header="Цвет" Width="70">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Width="16" Height="16" Background="{Binding StatusColor}" CornerRadius="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Button Grid.Row="1" Content="Отследить" Width="120" Click="BtnTrack_Click" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Инспектор">
+                <Grid Margin="10">
+                    <DataGrid x:Name="dgInspector" AutoGenerateColumns="False" IsReadOnly="True">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDangerous}" Value="True">
+                                        <Setter Property="Background" Value="#FFF6D6D6"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="QR" Binding="{Binding QrKod}" Width="*"/>
+                            <DataGridTextColumn Header="Опасность" Binding="{Binding DangerText}" Width="160"/>
+                            <DataGridTextColumn Header="Статус" Binding="{Binding StatusText}" Width="170"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Трекинг">
+                <Grid Margin="10">
+                    <ListBox x:Name="lbTracking">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderThickness="0,0,0,1" BorderBrush="#D0D3DA" Padding="6">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding TimeText}" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding Description}"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Page>
