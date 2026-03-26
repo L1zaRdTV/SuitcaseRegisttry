@@ -1,6 +1,8 @@
 ﻿using SuitcaseRegisttry.AppData;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,262 +10,366 @@ using System.Windows.Media;
 
 namespace SuitcaseRegisttry.Pages
 {
-    /// <summary>
-    /// Логика взаимодействия для Autorizaiton.xaml
-    /// </summary>
     public partial class Autorizaiton : Page
     {
-        private const int StatusRegistered = 1;
-        private const int StatusInspection = 2;
-        private const int StatusApproved = 3;
-
-        private readonly List<SuitcaseViewItem> _suitcases = new List<SuitcaseViewItem>();
-        private readonly List<TrackingViewItem> _tracking = new List<TrackingViewItem>();
+        private User _currentUser;
+        private string _currentRole;
 
         public Autorizaiton()
         {
             InitializeComponent();
-            LoadDemoData();
-            RefreshTables();
         }
 
-        private void BtnCheckSuitcase_Click(object sender, RoutedEventArgs e)
+        private SuitcaseRegistryEntities2 Db => AppConnect.Modelo11;
+
+        private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateInput())
+            if (Db == null)
             {
+                MessageBox.Show("Нет подключения к SQL Server.");
                 return;
             }
 
-            var suitcase = new Suitcase
+            var fio = txtLoginName.Text.Trim();
+            if (string.IsNullOrWhiteSpace(fio))
             {
-                QRKod = $"QR-{DateTime.Now:HHmmss}",
-                IDStatys = StatusRegistered,
+                MessageBox.Show("Введите имя.");
+                return;
+            }
+
+            _currentRole = ((ComboBoxItem)cbRole.SelectedItem).Content.ToString();
+            _currentUser = GetOrCreateUser(fio, _currentRole);
+            txtCurrentUser.Text = $"Вошёл: {_currentUser.FIO} ({_currentRole})";
+
+            PassengerPanel.Visibility = _currentRole == "Passenger" ? Visibility.Visible : Visibility.Collapsed;
+            InspectorPanel.Visibility = _currentRole == "Inspector" ? Visibility.Visible : Visibility.Collapsed;
+            LogisticPanel.Visibility = _currentRole == "Logistician" ? Visibility.Visible : Visibility.Collapsed;
+
+            LoadPassengerSuitcases();
+            LoadAllSuitcasesForInspector();
+            LoadLostSuitcases();
+        }
+
+        private User GetOrCreateUser(string fio, string roleName)
+        {
+            var roleId = Db.Roles.Where(r => r.Name == roleName).Select(r => r.IDRoles).FirstOrDefault();
+            if (roleId == 0)
+            {
+                var role = new Roles { Name = roleName };
+                Db.Roles.Add(role);
+                Db.SaveChanges();
+                roleId = role.IDRoles;
+            }
+
+            var user = Db.User.FirstOrDefault(u => u.FIO == fio && u.IDRoles == roleId);
+            if (user != null)
+            {
+                return user;
+            }
+
+            user = new User
+            {
+                FIO = fio,
+                IDRoles = roleId,
                 DateReg = DateTime.Now,
-                Last_Up = DateTime.Now,
-                SignDanger = cbDangerous.IsChecked == true ? "Опасно" : "Норма",
-                Weight = cbDangerous.IsChecked == true ? 36 : 18
+                Token = Guid.NewGuid().ToString("N")
             };
-
-            ProcessSuitcase(suitcase, cbEscape.IsChecked == true);
-
-            var viewItem = new SuitcaseViewItem
-            {
-                QrKod = suitcase.QRKod,
-                FlightCode = txtFlight.Text.Trim(),
-                StatusId = suitcase.IDStatys ?? StatusRegistered,
-                IsDangerous = suitcase.SignDanger == "Опасно",
-                DangerText = suitcase.SignDanger
-            };
-            viewItem.UpdateStatusVisual();
-            _suitcases.Insert(0, viewItem);
-
-            AddTracking($"{viewItem.QrKod}: статус изменён на '{viewItem.StatusText}'");
-            txtStatus.Text = $"Статус: {GetStatusName(suitcase.IDStatys)}";
-
-            RefreshTables();
+            Db.User.Add(user);
+            Db.SaveChanges();
+            return user;
         }
 
-        private bool ValidateInput()
+        // Функция из задания: add_suitcase
+        private void add_suitcase(int ownerId, string model, string colour, int weight, int dangerDegree)
         {
-            if (string.IsNullOrWhiteSpace(txtFIO.Text) || string.IsNullOrWhiteSpace(txtRoles.Text))
+            var statusId = GetStatusId("Зарегистрирован");
+
+            if (dangerDegree > 2)
             {
-                MessageBox.Show("Заполни ФИО и роль.", "Проверка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
+                statusId = GetStatusId("На досмотре", statusId);
             }
 
-            if (string.IsNullOrWhiteSpace(txtEmail.Text) || !txtEmail.Text.Contains("@"))
-            {
-                MessageBox.Show("Email выглядит некорректно.", "Проверка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
+            var sql = @"INSERT INTO Suitcase
+                        (QRKod, Owner, Model, Colour, Weight, IDDegreeDanger, IDStatys, DateReg, Last_Up, Features)
+                        VALUES
+                        (@qr, @owner, @model, @colour, @weight, @danger, @status, GETDATE(), GETDATE(), @features)";
 
-            if (string.IsNullOrWhiteSpace(txtFlight.Text))
-            {
-                MessageBox.Show("Нужен номер рейса.", "Проверка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
-
-            return true;
+            Db.Database.ExecuteSqlCommand(
+                sql,
+                new SqlParameter("@qr", "QR-" + DateTime.Now.ToString("yyyyMMddHHmmss")),
+                new SqlParameter("@owner", ownerId),
+                new SqlParameter("@model", model),
+                new SqlParameter("@colour", colour),
+                new SqlParameter("@weight", weight),
+                new SqlParameter("@danger", dangerDegree),
+                new SqlParameter("@status", statusId),
+                new SqlParameter("@features", dangerDegree > 2 ? "Авто: направлен на досмотр" : "Обычная регистрация")
+            );
         }
 
-        private void ProcessSuitcase(Suitcase suitcase, bool isEscape)
+        // Функция из задания: inspect_suitcase
+        private void inspect_suitcase(int suitcaseId, int inspectorId)
         {
-            if (suitcase == null)
+            Db.Database.ExecuteSqlCommand(
+                @"INSERT INTO Inspection (IDSuitcase, Inspector, Date, IDResult, Description)
+                  VALUES (@sid, @insp, GETDATE(), @result, @desc)",
+                new SqlParameter("@sid", suitcaseId),
+                new SqlParameter("@insp", inspectorId),
+                new SqlParameter("@result", 1),
+                new SqlParameter("@desc", "Плановый досмотр")
+            );
+
+            Db.Database.ExecuteSqlCommand(
+                @"UPDATE Suitcase SET IDStatys = @status, Last_Up = GETDATE() WHERE IDSuitcase = @sid",
+                new SqlParameter("@status", GetStatusId("На досмотре")),
+                new SqlParameter("@sid", suitcaseId)
+            );
+        }
+
+        // Функция из задания: confiscate_item
+        private void confiscate_item(int suitcaseId, int inspectorId, string subject)
+        {
+            Db.Database.ExecuteSqlCommand(
+                @"INSERT INTO ConfiscatedItem (IDSuitcase, Inspector, Subject, DateConfiscation)
+                  VALUES (@sid, @insp, @subject, GETDATE())",
+                new SqlParameter("@sid", suitcaseId),
+                new SqlParameter("@insp", inspectorId),
+                new SqlParameter("@subject", subject)
+            );
+
+            Db.Database.ExecuteSqlCommand(
+                @"UPDATE Suitcase SET IDStatys = @status, Last_Up = GETDATE() WHERE IDSuitcase = @sid",
+                new SqlParameter("@status", GetStatusId("Конфискован", GetStatusId("На досмотре"))),
+                new SqlParameter("@sid", suitcaseId)
+            );
+        }
+
+        // Функция из задания: update_tracking
+        private void update_tracking(int suitcaseId, string coordinate)
+        {
+            Db.Database.ExecuteSqlCommand(
+                @"INSERT INTO Tracking (IDSuitcase, Coordinate, IDStatysTracking, Time)
+                  VALUES (@sid, @coord, @status, GETDATE())",
+                new SqlParameter("@sid", suitcaseId),
+                new SqlParameter("@coord", coordinate),
+                new SqlParameter("@status", 1)
+            );
+        }
+
+        private void BtnAddSuitcase_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null || _currentRole != "Passenger")
             {
                 return;
             }
 
-            var isDangerous = suitcase.SignDanger == "Опасно";
-            var isOverweight = suitcase.Weight.HasValue && suitcase.Weight.Value > 30;
+            if (!int.TryParse(txtWeight.Text, out var weight)) weight = 15;
+            if (!int.TryParse(txtDanger.Text, out var danger)) danger = 1;
 
-            if (isDangerous || isOverweight)
+            add_suitcase(_currentUser.IDUser, txtModel.Text.Trim(), txtColour.Text.Trim(), weight, danger);
+
+            if (danger > 2)
             {
-                suitcase.IDStatys = StatusInspection;
-                CreateIncident(suitcase, isDangerous, isOverweight, false);
-            }
-            else
-            {
-                suitcase.IDStatys = StatusApproved;
+                AddIncidentByRule("Опасность выше 2. Отправлен на досмотр.");
             }
 
-            if (isEscape)
-            {
-                suitcase.IDStatys = StatusInspection;
-                CreateIncident(suitcase, false, false, true);
-                AddTracking($"{suitcase.QRKod}: событие 'Побег'. Создан INCIDENT");
-            }
-
-            suitcase.Last_Up = DateTime.Now;
+            LoadPassengerSuitcases();
+            LoadAllSuitcasesForInspector();
+            MessageBox.Show("Чемодан добавлен.");
         }
 
-        private void CreateIncident(Suitcase suitcase, bool isDangerous, bool isOverweight, bool isEscape)
+        private void BtnTrackPassenger_Click(object sender, RoutedEventArgs e)
         {
-            var description = "";
-
-            if (isEscape)
-            {
-                description = "Побег чемодана из зоны контроля.";
-            }
-            else if (isDangerous && isOverweight)
-            {
-                description = "Опасный и слишком тяжелый чемодан.";
-            }
-            else if (isDangerous)
-            {
-                description = "Опасные признаки в чемодане.";
-            }
-            else if (isOverweight)
-            {
-                description = "Превышение веса чемодана.";
-            }
-
-            var incident = new Incident
-            {
-                IDSuitcase = suitcase.IDSuitcase,
-                Date = DateTime.Now,
-                Place = txtFlight.Text,
-                Description = description,
-                IDStatysTypeIncident = 1
-            };
-
-            if (AppConnect.Modelo11 != null)
-            {
-                AppConnect.Modelo11.Incident.Add(incident);
-                AppConnect.Modelo11.SaveChanges();
-            }
-        }
-
-        private string GetStatusName(int? statusId)
-        {
-            switch (statusId)
-            {
-                case StatusRegistered:
-                    return "Зарегистрирован";
-                case StatusInspection:
-                    return "На досмотре";
-                case StatusApproved:
-                    return "Допущен к перевозке";
-                default:
-                    return "Неизвестно";
-            }
-        }
-
-        private void BtnTrack_Click(object sender, RoutedEventArgs e)
-        {
-            var selected = dgPassenger.SelectedItem as SuitcaseViewItem;
+            var selected = dgPassenger.SelectedItem as SuitcaseGridItem;
             if (selected == null)
             {
-                MessageBox.Show("Выбери чемодан в таблице пассажира.", "Трекинг", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Выберите чемодан.");
                 return;
             }
 
-            AddTracking($"Отследить: {selected.QrKod}, рейс {selected.FlightCode}, статус {selected.StatusText}");
-            RefreshTables();
+            var history = Db.Tracking
+                .Where(t => t.IDSuitcase == selected.IDSuitcase)
+                .OrderByDescending(t => t.Time)
+                .Take(20)
+                .Select(t => (t.Time.HasValue ? t.Time.Value.ToString("dd.MM HH:mm") : "--") + " | " + t.Coordinate)
+                .ToList();
+
+            lbPassengerTrack.ItemsSource = history;
         }
 
-        private void AddTracking(string description)
+        private void BtnInspect_Click(object sender, RoutedEventArgs e)
         {
-            _tracking.Insert(0, new TrackingViewItem
-            {
-                TimeText = DateTime.Now.ToString("dd.MM.yyyy HH:mm"),
-                Description = description
-            });
+            if (_currentUser == null) return;
+            var selected = dgInspector.SelectedItem as SuitcaseGridItem;
+            if (selected == null) return;
+
+            inspect_suitcase(selected.IDSuitcase, _currentUser.IDUser);
+            LoadAllSuitcasesForInspector();
         }
 
-        private void LoadDemoData()
+        private void BtnConfiscate_Click(object sender, RoutedEventArgs e)
         {
-            _suitcases.Add(new SuitcaseViewItem
-            {
-                QrKod = "QR-100501",
-                FlightCode = "MSK-77",
-                StatusId = StatusApproved,
-                IsDangerous = false,
-                DangerText = "Норма"
-            });
-            _suitcases.Add(new SuitcaseViewItem
-            {
-                QrKod = "QR-100777",
-                FlightCode = "KZN-12",
-                StatusId = StatusInspection,
-                IsDangerous = true,
-                DangerText = "Опасно"
-            });
+            if (_currentUser == null) return;
+            var selected = dgInspector.SelectedItem as SuitcaseGridItem;
+            if (selected == null) return;
 
-            foreach (var item in _suitcases)
+            var subject = string.IsNullOrWhiteSpace(txtConfiscateSubject.Text) ? "Неизвестный предмет" : txtConfiscateSubject.Text.Trim();
+            confiscate_item(selected.IDSuitcase, _currentUser.IDUser, subject);
+            LoadAllSuitcasesForInspector();
+        }
+
+        private void BtnSearchLost_Click(object sender, RoutedEventArgs e)
+        {
+            LoadLostSuitcases(txtSearchLost.Text.Trim());
+        }
+
+        private void BtnUpdateTracking_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = dgLost.SelectedItem as SuitcaseGridItem;
+            if (selected == null)
             {
-                item.UpdateStatusVisual();
+                return;
             }
 
-            AddTracking("QR-100501: прибыл в пункт досмотра");
-            AddTracking("QR-100777: отправлен инспектору");
+            update_tracking(selected.IDSuitcase, txtCoordinate.Text.Trim());
+            MessageBox.Show("Координата обновлена.");
         }
 
-        private void RefreshTables()
+        private void BtnAddIncident_Click(object sender, RoutedEventArgs e)
         {
-            dgPassenger.ItemsSource = null;
-            dgPassenger.ItemsSource = _suitcases;
-
-            dgInspector.ItemsSource = null;
-            dgInspector.ItemsSource = _suitcases;
-
-            lbTracking.ItemsSource = null;
-            lbTracking.ItemsSource = _tracking;
-        }
-
-        private class SuitcaseViewItem
-        {
-            public string QrKod { get; set; }
-            public string FlightCode { get; set; }
-            public int StatusId { get; set; }
-            public string StatusText { get; set; }
-            public Brush StatusColor { get; set; }
-            public bool IsDangerous { get; set; }
-            public string DangerText { get; set; }
-
-            public void UpdateStatusVisual()
+            var selected = dgLost.SelectedItem as SuitcaseGridItem;
+            if (selected == null)
             {
-                switch (StatusId)
+                return;
+            }
+
+            Db.Incident.Add(new Incident
+            {
+                IDSuitcase = selected.IDSuitcase,
+                Date = DateTime.Now,
+                Place = txtCoordinate.Text,
+                Description = "Проблема с потерянным чемоданом",
+                IDTypeIncident = 1,
+                IDStatysTypeIncident = 1,
+                Responsible = _currentUser?.IDUser
+            });
+            Db.SaveChanges();
+            MessageBox.Show("Incident записан.");
+        }
+
+        private void AddIncidentByRule(string description)
+        {
+            var lastSuitcaseId = Db.Suitcase.OrderByDescending(s => s.IDSuitcase).Select(s => s.IDSuitcase).FirstOrDefault();
+            if (lastSuitcaseId == 0)
+            {
+                return;
+            }
+
+            Db.Incident.Add(new Incident
+            {
+                IDSuitcase = lastSuitcaseId,
+                Date = DateTime.Now,
+                Place = "Стойка регистрации",
+                Description = description,
+                IDTypeIncident = 1,
+                IDStatysTypeIncident = 1,
+                Responsible = _currentUser?.IDUser
+            });
+            Db.SaveChanges();
+        }
+
+        private void LoadPassengerSuitcases()
+        {
+            if (_currentUser == null)
+            {
+                return;
+            }
+
+            // SELECT из задания: где Owner = пользователь.
+            var list = Db.Suitcase
+                .Where(s => s.Owner == _currentUser.IDUser)
+                .Select(s => new SuitcaseGridItem
                 {
-                    case StatusInspection:
-                        StatusText = "На досмотре";
-                        StatusColor = Brushes.IndianRed;
-                        break;
-                    case StatusApproved:
-                        StatusText = "Допущен";
-                        StatusColor = Brushes.SeaGreen;
-                        break;
-                    default:
-                        StatusText = "Зарегистрирован";
-                        StatusColor = Brushes.SteelBlue;
-                        break;
-                }
-            }
+                    IDSuitcase = s.IDSuitcase,
+                    QRKod = s.QRKod,
+                    Model = s.Model,
+                    Owner = s.Owner,
+                    IDDegreeDanger = s.IDDegreeDanger,
+                    StatusName = s.Statys != null ? s.Statys.Name : "Без статуса"
+                })
+                .ToList();
+
+            list.ForEach(x => x.StatusColor = GetStatusBrush(x.StatusName));
+            dgPassenger.ItemsSource = list;
         }
 
-        private class TrackingViewItem
+        private void LoadAllSuitcasesForInspector()
         {
-            public string TimeText { get; set; }
-            public string Description { get; set; }
+            var list = Db.Suitcase
+                .Select(s => new SuitcaseGridItem
+                {
+                    IDSuitcase = s.IDSuitcase,
+                    QRKod = s.QRKod,
+                    Model = s.Model,
+                    Owner = s.Owner,
+                    IDDegreeDanger = s.IDDegreeDanger,
+                    StatusName = s.Statys != null ? s.Statys.Name : "Без статуса"
+                })
+                .ToList();
+
+            list.ForEach(x => x.StatusColor = GetStatusBrush(x.StatusName));
+            dgInspector.ItemsSource = list;
+        }
+
+        private void LoadLostSuitcases(string qrFilter = "")
+        {
+            var query = Db.Suitcase.Where(s => s.Statys != null && s.Statys.Name.Contains("Потер"));
+
+            if (!string.IsNullOrWhiteSpace(qrFilter))
+            {
+                query = query.Where(s => s.QRKod.Contains(qrFilter));
+            }
+
+            var list = query
+                .Select(s => new SuitcaseGridItem
+                {
+                    IDSuitcase = s.IDSuitcase,
+                    QRKod = s.QRKod,
+                    Model = s.Model,
+                    Owner = s.Owner,
+                    IDDegreeDanger = s.IDDegreeDanger,
+                    StatusName = s.Statys.Name
+                })
+                .ToList();
+
+            list.ForEach(x => x.StatusColor = GetStatusBrush(x.StatusName));
+            dgLost.ItemsSource = list;
+        }
+
+        private int GetStatusId(string statusName, int fallback = 1)
+        {
+            var id = Db.Statys.Where(s => s.Name == statusName).Select(s => s.IDStatys).FirstOrDefault();
+            return id == 0 ? fallback : id;
+        }
+
+        private Brush GetStatusBrush(string status)
+        {
+            if (status == null) return Brushes.Gray;
+            if (status.Contains("Потер")) return Brushes.IndianRed;
+            if (status.Contains("досмотр") || status.Contains("Досмотр")) return Brushes.Orange;
+            if (status.Contains("Зарегистр")) return Brushes.SteelBlue;
+            return Brushes.Gray;
+        }
+
+        private class SuitcaseGridItem
+        {
+            public int IDSuitcase { get; set; }
+            public string QRKod { get; set; }
+            public string Model { get; set; }
+            public int? Owner { get; set; }
+            public int? IDDegreeDanger { get; set; }
+            public string StatusName { get; set; }
+            public Brush StatusColor { get; set; }
         }
     }
 }
