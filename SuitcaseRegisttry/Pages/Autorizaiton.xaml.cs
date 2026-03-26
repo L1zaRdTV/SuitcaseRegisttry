@@ -33,21 +33,27 @@ namespace SuitcaseRegisttry.Pages
             var fio = txtLoginName.Text.Trim();
             if (string.IsNullOrWhiteSpace(fio))
             {
-                MessageBox.Show("Введите имя.");
+                MessageBox.Show("Введите ФИО.");
                 return;
             }
 
             _currentRole = ((ComboBoxItem)cbRole.SelectedItem).Content.ToString();
             _currentUser = GetOrCreateUser(fio, _currentRole);
-            txtCurrentUser.Text = $"Вошёл: {_currentUser.FIO} ({_currentRole})";
 
-            PassengerPanel.Visibility = _currentRole == "Passenger" ? Visibility.Visible : Visibility.Collapsed;
-            InspectorPanel.Visibility = _currentRole == "Inspector" ? Visibility.Visible : Visibility.Collapsed;
-            LogisticPanel.Visibility = _currentRole == "Logistician" ? Visibility.Visible : Visibility.Collapsed;
+            txtCurrentUser.Text = $"Авторизован: {_currentUser.FIO} ({_currentRole})";
+            txtWelcome.Text = $"Здравствуйте, {_currentUser.FIO}!";
+            txtTicket.Text = $"Номер билета: {(_currentUser.NumberTicet.HasValue ? _currentUser.NumberTicet.Value.ToString() : "не назначен")}";
+
+            PassengerTab.Visibility = _currentRole == "Passenger" ? Visibility.Visible : Visibility.Collapsed;
+            InspectorTab.Visibility = _currentRole == "Inspector" ? Visibility.Visible : Visibility.Collapsed;
+            LogisticTab.Visibility = _currentRole == "Logistician" ? Visibility.Visible : Visibility.Collapsed;
 
             LoadPassengerSuitcases();
+            LoadPassengerIncidents();
             LoadAllSuitcasesForInspector();
+            LoadInspectorJournal();
             LoadLostSuitcases();
+            LoadLogisticTimeline();
         }
 
         private User GetOrCreateUser(string fio, string roleName)
@@ -72,88 +78,91 @@ namespace SuitcaseRegisttry.Pages
                 FIO = fio,
                 IDRoles = roleId,
                 DateReg = DateTime.Now,
-                Token = Guid.NewGuid().ToString("N")
+                Token = Guid.NewGuid().ToString("N"),
+                NumberTicet = new Random().Next(10000, 99999)
             };
             Db.User.Add(user);
             Db.SaveChanges();
             return user;
         }
 
-        // Функция из задания: add_suitcase
         private void add_suitcase(int ownerId, string model, string colour, int weight, int dangerDegree)
         {
             var statusId = GetStatusId("Зарегистрирован");
-
             if (dangerDegree > 2)
             {
                 statusId = GetStatusId("На досмотре", statusId);
             }
 
-            var sql = @"INSERT INTO Suitcase
-                        (QRKod, Owner, Model, Colour, Weight, IDDegreeDanger, IDStatys, DateReg, Last_Up, Features)
-                        VALUES
-                        (@qr, @owner, @model, @colour, @weight, @danger, @status, GETDATE(), GETDATE(), @features)";
-
             Db.Database.ExecuteSqlCommand(
-                sql,
+                @"INSERT INTO Suitcase
+                  (QRKod, Owner, Model, Colour, Weight, IDDegreeDanger, IDStatys, DateReg, Last_Up, Features)
+                  VALUES
+                  (@qr, @owner, @model, @colour, @weight, @danger, @status, GETDATE(), GETDATE(), @features)",
                 new SqlParameter("@qr", "QR-" + DateTime.Now.ToString("yyyyMMddHHmmss")),
                 new SqlParameter("@owner", ownerId),
-                new SqlParameter("@model", model),
-                new SqlParameter("@colour", colour),
+                new SqlParameter("@model", string.IsNullOrWhiteSpace(model) ? "Неизвестная модель" : model),
+                new SqlParameter("@colour", string.IsNullOrWhiteSpace(colour) ? "Не указан" : colour),
                 new SqlParameter("@weight", weight),
                 new SqlParameter("@danger", dangerDegree),
                 new SqlParameter("@status", statusId),
-                new SqlParameter("@features", dangerDegree > 2 ? "Авто: направлен на досмотр" : "Обычная регистрация")
-            );
+                new SqlParameter("@features", dangerDegree > 2 ? "Авто: направлен на досмотр" : "Обычная регистрация"));
         }
 
-        // Функция из задания: inspect_suitcase
         private void inspect_suitcase(int suitcaseId, int inspectorId)
         {
             Db.Database.ExecuteSqlCommand(
-                @"INSERT INTO Inspection (IDSuitcase, Inspector, Date, IDResult, Description)
-                  VALUES (@sid, @insp, GETDATE(), @result, @desc)",
+                @"INSERT INTO Inspection (IDSuitcase, Inspector, Date, IDTypeInspection, IDResult, Description, Conclusion)
+                  VALUES (@sid, @insp, GETDATE(), @type, @result, @desc, @conc)",
                 new SqlParameter("@sid", suitcaseId),
                 new SqlParameter("@insp", inspectorId),
+                new SqlParameter("@type", 1),
                 new SqlParameter("@result", 1),
-                new SqlParameter("@desc", "Плановый досмотр")
-            );
+                new SqlParameter("@desc", "Плановый досмотр сотрудником"),
+                new SqlParameter("@conc", "Запрещенных предметов не выявлено"));
 
             Db.Database.ExecuteSqlCommand(
                 @"UPDATE Suitcase SET IDStatys = @status, Last_Up = GETDATE() WHERE IDSuitcase = @sid",
-                new SqlParameter("@status", GetStatusId("На досмотре")),
-                new SqlParameter("@sid", suitcaseId)
-            );
+                new SqlParameter("@status", GetStatusId("Досмотр пройден", GetStatusId("На досмотре"))),
+                new SqlParameter("@sid", suitcaseId));
+
+            Db.Database.ExecuteSqlCommand(
+                @"INSERT INTO Tracking (IDSuitcase, Coordinate, IDStatysTracking, Time, Scanned)
+                  VALUES (@sid, @coord, @trackStatus, GETDATE(), @scanned)",
+                new SqlParameter("@sid", suitcaseId),
+                new SqlParameter("@coord", "Пункт досмотра: пройден"),
+                new SqlParameter("@trackStatus", 1),
+                new SqlParameter("@scanned", inspectorId));
         }
 
-        // Функция из задания: confiscate_item
         private void confiscate_item(int suitcaseId, int inspectorId, string subject)
         {
             Db.Database.ExecuteSqlCommand(
-                @"INSERT INTO ConfiscatedItem (IDSuitcase, Inspector, Subject, DateConfiscation)
-                  VALUES (@sid, @insp, @subject, GETDATE())",
+                @"INSERT INTO ConfiscatedItem (IDSuitcase, Inspector, Subject, Quantity, Measurement, DateConfiscation, Storagelocation, Destroyed)
+                  VALUES (@sid, @insp, @subject, @qty, @measurement, GETDATE(), @storage, @destroyed)",
                 new SqlParameter("@sid", suitcaseId),
                 new SqlParameter("@insp", inspectorId),
-                new SqlParameter("@subject", subject)
-            );
+                new SqlParameter("@subject", subject),
+                new SqlParameter("@qty", 1),
+                new SqlParameter("@measurement", "шт"),
+                new SqlParameter("@storage", "Склад службы безопасности"),
+                new SqlParameter("@destroyed", 0));
 
             Db.Database.ExecuteSqlCommand(
                 @"UPDATE Suitcase SET IDStatys = @status, Last_Up = GETDATE() WHERE IDSuitcase = @sid",
                 new SqlParameter("@status", GetStatusId("Конфискован", GetStatusId("На досмотре"))),
-                new SqlParameter("@sid", suitcaseId)
-            );
+                new SqlParameter("@sid", suitcaseId));
         }
 
-        // Функция из задания: update_tracking
         private void update_tracking(int suitcaseId, string coordinate)
         {
             Db.Database.ExecuteSqlCommand(
-                @"INSERT INTO Tracking (IDSuitcase, Coordinate, IDStatysTracking, Time)
-                  VALUES (@sid, @coord, @status, GETDATE())",
+                @"INSERT INTO Tracking (IDSuitcase, Coordinate, IDStatysTracking, Time, Scanned)
+                  VALUES (@sid, @coord, @status, GETDATE(), @scanned)",
                 new SqlParameter("@sid", suitcaseId),
                 new SqlParameter("@coord", coordinate),
-                new SqlParameter("@status", 1)
-            );
+                new SqlParameter("@status", 1),
+                new SqlParameter("@scanned", _currentUser != null ? (object)_currentUser.IDUser : DBNull.Value));
         }
 
         private void BtnAddSuitcase_Click(object sender, RoutedEventArgs e)
@@ -170,17 +179,18 @@ namespace SuitcaseRegisttry.Pages
 
             if (danger > 2)
             {
-                AddIncidentByRule("Опасность выше 2. Отправлен на досмотр.");
+                AddIncidentByRule("Опасность выше 2. Чемодан автоматически отправлен на досмотр.");
             }
 
             LoadPassengerSuitcases();
+            LoadPassengerIncidents();
             LoadAllSuitcasesForInspector();
-            MessageBox.Show("Чемодан добавлен.");
+            MessageBox.Show("Чемодан успешно зарегистрирован.");
         }
 
         private void BtnTrackPassenger_Click(object sender, RoutedEventArgs e)
         {
-            var selected = dgPassenger.SelectedItem as SuitcaseGridItem;
+            var selected = ResolvePassengerSelection(sender);
             if (selected == null)
             {
                 MessageBox.Show("Выберите чемодан.");
@@ -189,33 +199,89 @@ namespace SuitcaseRegisttry.Pages
 
             var history = Db.Tracking
                 .Where(t => t.IDSuitcase == selected.IDSuitcase)
-                .OrderByDescending(t => t.Time)
-                .Take(20)
-                .Select(t => (t.Time.HasValue ? t.Time.Value.ToString("dd.MM HH:mm") : "--") + " | " + t.Coordinate)
+                .OrderBy(t => t.Time)
+                .Take(30)
+                .Select(t => new
+                {
+                    Time = t.Time,
+                    Location = t.Coordinate,
+                    Status = t.StatysTracking != null ? t.StatysTracking.Name : "в обработке"
+                })
                 .ToList();
 
-            lbPassengerTrack.ItemsSource = history;
+            lbPassengerTrack.ItemsSource = history
+                .Select(t => string.Format("{0} — {1} ({2})",
+                    t.Time.HasValue ? IconForStep(t.Status) + " " + t.Time.Value.ToString("HH:mm") : "⏳ --:--",
+                    string.IsNullOrWhiteSpace(t.Location) ? "Локация не указана" : t.Location,
+                    t.Status))
+                .ToList();
+        }
+
+        private void BtnPassengerReportProblem_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = ResolvePassengerSelection(sender);
+            if (selected == null)
+            {
+                MessageBox.Show("Выберите чемодан для фиксации проблемы.");
+                return;
+            }
+
+            Db.Incident.Add(new Incident
+            {
+                IDSuitcase = selected.IDSuitcase,
+                Date = DateTime.Now,
+                Place = "Личный кабинет пассажира",
+                Description = "Пассажир сообщил о проблеме с чемоданом.",
+                IDTypeIncident = 1,
+                IDStatysTypeIncident = 1,
+                Responsible = _currentUser != null ? (int?)_currentUser.IDUser : null
+            });
+            Db.SaveChanges();
+
+            LoadPassengerIncidents();
+            MessageBox.Show("Сообщение о проблеме отправлено.");
         }
 
         private void BtnInspect_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser == null) return;
+            if (_currentUser == null)
+            {
+                return;
+            }
+
             var selected = dgInspector.SelectedItem as SuitcaseGridItem;
-            if (selected == null) return;
+            if (selected == null)
+            {
+                MessageBox.Show("Выберите чемодан для досмотра.");
+                return;
+            }
 
             inspect_suitcase(selected.IDSuitcase, _currentUser.IDUser);
             LoadAllSuitcasesForInspector();
+            LoadInspectorJournal();
+            MessageBox.Show("Досмотр завершен.");
         }
 
         private void BtnConfiscate_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser == null) return;
+            if (_currentUser == null)
+            {
+                return;
+            }
+
             var selected = dgInspector.SelectedItem as SuitcaseGridItem;
-            if (selected == null) return;
+            if (selected == null)
+            {
+                MessageBox.Show("Выберите чемодан для конфискации предмета.");
+                return;
+            }
 
             var subject = string.IsNullOrWhiteSpace(txtConfiscateSubject.Text) ? "Неизвестный предмет" : txtConfiscateSubject.Text.Trim();
             confiscate_item(selected.IDSuitcase, _currentUser.IDUser, subject);
+
             LoadAllSuitcasesForInspector();
+            LoadInspectorJournal();
+            MessageBox.Show("Предмет конфискован.");
         }
 
         private void BtnSearchLost_Click(object sender, RoutedEventArgs e)
@@ -228,11 +294,19 @@ namespace SuitcaseRegisttry.Pages
             var selected = dgLost.SelectedItem as SuitcaseGridItem;
             if (selected == null)
             {
+                MessageBox.Show("Выберите чемодан.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtCoordinate.Text))
+            {
+                MessageBox.Show("Введите новую локацию.");
                 return;
             }
 
             update_tracking(selected.IDSuitcase, txtCoordinate.Text.Trim());
-            MessageBox.Show("Координата обновлена.");
+            LoadLogisticTimeline();
+            MessageBox.Show("Местоположение обновлено.");
         }
 
         private void BtnAddIncident_Click(object sender, RoutedEventArgs e)
@@ -240,6 +314,7 @@ namespace SuitcaseRegisttry.Pages
             var selected = dgLost.SelectedItem as SuitcaseGridItem;
             if (selected == null)
             {
+                MessageBox.Show("Выберите чемодан.");
                 return;
             }
 
@@ -247,14 +322,24 @@ namespace SuitcaseRegisttry.Pages
             {
                 IDSuitcase = selected.IDSuitcase,
                 Date = DateTime.Now,
-                Place = txtCoordinate.Text,
-                Description = "Проблема с потерянным чемоданом",
+                Place = string.IsNullOrWhiteSpace(txtCoordinate.Text) ? "Логистический центр" : txtCoordinate.Text.Trim(),
+                Description = "Логист зафиксировал инцидент по маршруту поиска.",
                 IDTypeIncident = 1,
                 IDStatysTypeIncident = 1,
-                Responsible = _currentUser?.IDUser
+                Responsible = _currentUser != null ? (int?)_currentUser.IDUser : null
             });
             Db.SaveChanges();
-            MessageBox.Show("Incident записан.");
+
+            LoadPassengerIncidents();
+            MessageBox.Show("Инцидент записан.");
+        }
+
+        private void lbPassengerSuitcases_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_currentRole == "Passenger")
+            {
+                BtnTrackPassenger_Click(sender, null);
+            }
         }
 
         private void AddIncidentByRule(string description)
@@ -273,7 +358,7 @@ namespace SuitcaseRegisttry.Pages
                 Description = description,
                 IDTypeIncident = 1,
                 IDStatysTypeIncident = 1,
-                Responsible = _currentUser?.IDUser
+                Responsible = _currentUser != null ? (int?)_currentUser.IDUser : null
             });
             Db.SaveChanges();
         }
@@ -282,10 +367,10 @@ namespace SuitcaseRegisttry.Pages
         {
             if (_currentUser == null)
             {
+                lbPassengerSuitcases.ItemsSource = null;
                 return;
             }
 
-            // SELECT из задания: где Owner = пользователь.
             var list = Db.Suitcase
                 .Where(s => s.Owner == _currentUser.IDUser)
                 .Select(s => new SuitcaseGridItem
@@ -293,14 +378,39 @@ namespace SuitcaseRegisttry.Pages
                     IDSuitcase = s.IDSuitcase,
                     QRKod = s.QRKod,
                     Model = s.Model,
+                    Colour = s.Colour,
                     Owner = s.Owner,
+                    OwnerName = s.User != null ? s.User.FIO : "Без владельца",
                     IDDegreeDanger = s.IDDegreeDanger,
                     StatusName = s.Statys != null ? s.Statys.Name : "Без статуса"
                 })
                 .ToList();
 
             list.ForEach(x => x.StatusColor = GetStatusBrush(x.StatusName));
-            dgPassenger.ItemsSource = list;
+            lbPassengerSuitcases.ItemsSource = list;
+        }
+
+        private void LoadPassengerIncidents()
+        {
+            if (_currentUser == null)
+            {
+                lbPassengerIncidents.ItemsSource = null;
+                return;
+            }
+
+            var suitcaseIds = Db.Suitcase.Where(s => s.Owner == _currentUser.IDUser).Select(s => s.IDSuitcase).ToList();
+            var incidents = Db.Incident
+                .Where(i => i.IDSuitcase.HasValue && suitcaseIds.Contains(i.IDSuitcase.Value))
+                .OrderByDescending(i => i.Date)
+                .Take(20)
+                .ToList()
+                .Select(i => string.Format("{0}: {1} | {2}",
+                    i.Date.HasValue ? i.Date.Value.ToString("dd.MM.yyyy HH:mm") : "--",
+                    string.IsNullOrWhiteSpace(i.Description) ? "Без описания" : i.Description,
+                    i.StatysTypeIncident != null ? i.StatysTypeIncident.Name : "Статус не указан"))
+                .ToList();
+
+            lbPassengerIncidents.ItemsSource = incidents;
         }
 
         private void LoadAllSuitcasesForInspector()
@@ -311,19 +421,39 @@ namespace SuitcaseRegisttry.Pages
                     IDSuitcase = s.IDSuitcase,
                     QRKod = s.QRKod,
                     Model = s.Model,
+                    Colour = s.Colour,
                     Owner = s.Owner,
+                    OwnerName = s.User != null ? s.User.FIO : "Без владельца",
                     IDDegreeDanger = s.IDDegreeDanger,
                     StatusName = s.Statys != null ? s.Statys.Name : "Без статуса"
                 })
                 .ToList();
 
             list.ForEach(x => x.StatusColor = GetStatusBrush(x.StatusName));
-            dgInspector.ItemsSource = list;
+            dgInspector.ItemsSource = list.OrderByDescending(x => x.IDDegreeDanger ?? 0).ThenBy(x => x.StatusName).ToList();
+        }
+
+        private void LoadInspectorJournal()
+        {
+            var logs = Db.Inspection
+                .Include(i => i.Suitcase)
+                .Include(i => i.User)
+                .OrderByDescending(i => i.Date)
+                .Take(25)
+                .ToList()
+                .Select(i => string.Format("{0}: Чемодан #{1} ({2}) — {3}",
+                    i.Date.HasValue ? i.Date.Value.ToString("dd.MM HH:mm") : "--",
+                    i.IDSuitcase.HasValue ? i.IDSuitcase.Value.ToString() : "?",
+                    i.Suitcase != null ? i.Suitcase.QRKod : "без QR",
+                    i.Description ?? "досмотр"))
+                .ToList();
+
+            lbInspectorJournal.ItemsSource = logs;
         }
 
         private void LoadLostSuitcases(string qrFilter = "")
         {
-            var query = Db.Suitcase.Where(s => s.Statys != null && s.Statys.Name.Contains("Потер"));
+            var query = Db.Suitcase.Where(s => s.Statys != null && (s.Statys.Name.Contains("Потер") || s.Statys.Name.Contains("Розыск")));
 
             if (!string.IsNullOrWhiteSpace(qrFilter))
             {
@@ -336,7 +466,9 @@ namespace SuitcaseRegisttry.Pages
                     IDSuitcase = s.IDSuitcase,
                     QRKod = s.QRKod,
                     Model = s.Model,
+                    Colour = s.Colour,
                     Owner = s.Owner,
+                    OwnerName = s.User != null ? s.User.FIO : "Без владельца",
                     IDDegreeDanger = s.IDDegreeDanger,
                     StatusName = s.Statys.Name
                 })
@@ -344,6 +476,31 @@ namespace SuitcaseRegisttry.Pages
 
             list.ForEach(x => x.StatusColor = GetStatusBrush(x.StatusName));
             dgLost.ItemsSource = list;
+        }
+
+        private void LoadLogisticTimeline()
+        {
+            var timeline = Db.Tracking
+                .OrderByDescending(t => t.Time)
+                .Take(25)
+                .ToList()
+                .Select(t => string.Format("{0} — Чемодан #{1}: {2}",
+                    t.Time.HasValue ? t.Time.Value.ToString("dd.MM HH:mm") : "--",
+                    t.IDSuitcase.HasValue ? t.IDSuitcase.Value.ToString() : "?",
+                    string.IsNullOrWhiteSpace(t.Coordinate) ? "без локации" : t.Coordinate))
+                .ToList();
+
+            lbLogisticTimeline.ItemsSource = timeline;
+        }
+
+        private SuitcaseGridItem ResolvePassengerSelection(object sender)
+        {
+            if (sender is Button btn && btn.Tag is SuitcaseGridItem)
+            {
+                return (SuitcaseGridItem)btn.Tag;
+            }
+
+            return lbPassengerSuitcases.SelectedItem as SuitcaseGridItem;
         }
 
         private int GetStatusId(string statusName, int fallback = 1)
@@ -354,11 +511,25 @@ namespace SuitcaseRegisttry.Pages
 
         private Brush GetStatusBrush(string status)
         {
-            if (status == null) return Brushes.Gray;
+            if (string.IsNullOrWhiteSpace(status)) return Brushes.Gray;
             if (status.Contains("Потер")) return Brushes.IndianRed;
-            if (status.Contains("досмотр") || status.Contains("Досмотр")) return Brushes.Orange;
+            if (status.Contains("досмотр") || status.Contains("Досмотр")) return Brushes.DarkOrange;
+            if (status.Contains("Конфиск")) return Brushes.DarkViolet;
             if (status.Contains("Зарегистр")) return Brushes.SteelBlue;
-            return Brushes.Gray;
+            if (status.Contains("пройден") || status.Contains("Прибыл")) return Brushes.SeaGreen;
+            return Brushes.SlateGray;
+        }
+
+        private string IconForStep(string status)
+        {
+            var source = status ?? string.Empty;
+            if (source.Contains("Зарегистр")) return "🟢";
+            if (source.Contains("досмотр") || source.Contains("Досмотр")) return "🟡";
+            if (source.Contains("пройден")) return "🔵";
+            if (source.Contains("рейс")) return "🟣";
+            if (source.Contains("Порт")) return "⚫";
+            if (source.Contains("Прибыл")) return "✅";
+            return "🔹";
         }
 
         private class SuitcaseGridItem
@@ -366,7 +537,9 @@ namespace SuitcaseRegisttry.Pages
             public int IDSuitcase { get; set; }
             public string QRKod { get; set; }
             public string Model { get; set; }
+            public string Colour { get; set; }
             public int? Owner { get; set; }
+            public string OwnerName { get; set; }
             public int? IDDegreeDanger { get; set; }
             public string StatusName { get; set; }
             public Brush StatusColor { get; set; }
