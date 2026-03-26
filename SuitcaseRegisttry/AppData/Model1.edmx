@@ -1,0 +1,1838 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Хранилище SuitcaseRegistryModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BaggageRegistration">
+          <Key>
+            <PropertyRef Name="IDBagReg" />
+          </Key>
+          <Property Name="IDBagReg" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSuitcase" Type="int" />
+          <Property Name="IDFlight" Type="int" />
+          <Property Name="Passegir" Type="int" />
+          <Property Name="WeightReg" Type="int" />
+          <Property Name="DateReg" Type="datetime" />
+          <Property Name="ReceptionDesk" Type="int" />
+          <Property Name="Operator" Type="int" />
+          <Property Name="Cheque" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="BlackList">
+          <Key>
+            <PropertyRef Name="IDBlackList" />
+          </Key>
+          <Property Name="IDBlackList" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSuitcase" Type="int" />
+          <Property Name="Owner" Type="int" />
+          <Property Name="Reason" Type="nvarchar(max)" />
+          <Property Name="IDLevel" Type="int" />
+          <Property Name="DateADD" Type="datetime" />
+          <Property Name="AddPerson" Type="int" />
+          <Property Name="ValidityPeriod" Type="datetime" />
+        </EntityType>
+        <EntityType Name="CICategory">
+          <Key>
+            <PropertyRef Name="IDCICategory" />
+          </Key>
+          <Property Name="IDCICategory" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ConfiscatedItem">
+          <Key>
+            <PropertyRef Name="IDConfiscatedItem" />
+          </Key>
+          <Property Name="IDConfiscatedItem" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSuitcase" Type="int" />
+          <Property Name="Inspector" Type="int" />
+          <Property Name="Subject" Type="nvarchar" MaxLength="50" />
+          <Property Name="IDCICategory" Type="int" />
+          <Property Name="IDDegreeProhibition" Type="int" />
+          <Property Name="Quantity" Type="int" />
+          <Property Name="Measurement" Type="nvarchar" MaxLength="50" />
+          <Property Name="DateConfiscation" Type="datetime" />
+          <Property Name="Storagelocation" Type="nvarchar" MaxLength="50" />
+          <Property Name="Destroyed" Type="int" />
+          <Property Name="DateDestroyed" Type="datetime" />
+        </EntityType>
+        <EntityType Name="DegreeDanger">
+          <Key>
+            <PropertyRef Name="IDDegreeDanger" />
+          </Key>
+          <Property Name="IDDegreeDanger" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="DegreeProhibition">
+          <Key>
+            <PropertyRef Name="IDDegreeProhibition" />
+          </Key>
+          <Property Name="IDDegreeProhibition" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Flight">
+          <Key>
+            <PropertyRef Name="IDFlight" />
+          </Key>
+          <Property Name="IDFlight" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DestinationPortal" Type="nvarchar" MaxLength="50" />
+          <Property Name="DateTime" Type="datetime" />
+          <Property Name="IDStatysFlight" Type="int" />
+          <Property Name="Operator" Type="int" />
+          <Property Name="NumberSuitcases" Type="int" />
+          <Property Name="Note" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Incident">
+          <Key>
+            <PropertyRef Name="IDIncident" />
+          </Key>
+          <Property Name="IDIncident" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSuitcase" Type="int" />
+          <Property Name="IDFlight" Type="int" />
+          <Property Name="IDTypeIncident" Type="int" />
+          <Property Name="Date" Type="datetime" />
+          <Property Name="Place" Type="nvarchar(max)" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="IDStatysTypeIncident" Type="int" />
+          <Property Name="Responsible" Type="int" />
+          <Property Name="Damage" Type="int" />
+        </EntityType>
+        <EntityType Name="Inspection">
+          <Key>
+            <PropertyRef Name="IDInspection" />
+          </Key>
+          <Property Name="IDInspection" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSuitcase" Type="int" />
+          <Property Name="Inspector" Type="int" />
+          <Property Name="Date" Type="datetime" />
+          <Property Name="IDTypeInspection" Type="int" />
+          <Property Name="IDResult" Type="int" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Conclusion" Type="nvarchar(max)" />
+          <Property Name="PhotoEvidence" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Level">
+          <Key>
+            <PropertyRef Name="IDLevel" />
+          </Key>
+          <Property Name="IDLevel" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Result">
+          <Key>
+            <PropertyRef Name="IDResult" />
+          </Key>
+          <Property Name="IDResult" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="IDRoles" />
+          </Key>
+          <Property Name="IDRoles" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Statys">
+          <Key>
+            <PropertyRef Name="IDStatys" />
+          </Key>
+          <Property Name="IDStatys" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="StatysFlight">
+          <Key>
+            <PropertyRef Name="IDStatysFlight" />
+          </Key>
+          <Property Name="IDStatysFlight" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="StatysTracking">
+          <Key>
+            <PropertyRef Name="IDStatysTracking" />
+          </Key>
+          <Property Name="IDStatysTracking" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="StatysTypeIncident">
+          <Key>
+            <PropertyRef Name="IDStatysTypeIncident" />
+          </Key>
+          <Property Name="IDStatysTypeIncident" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Suitcase">
+          <Key>
+            <PropertyRef Name="IDSuitcase" />
+          </Key>
+          <Property Name="IDSuitcase" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="QRKod" Type="nvarchar" MaxLength="50" />
+          <Property Name="Owner" Type="int" />
+          <Property Name="Model" Type="nvarchar" MaxLength="50" />
+          <Property Name="Colour" Type="nchar" MaxLength="10" />
+          <Property Name="Matireal" Type="nvarchar" MaxLength="50" />
+          <Property Name="Weight" Type="int" />
+          <Property Name="IDDegreeDanger" Type="int" />
+          <Property Name="SignDanger" Type="nvarchar(max)" />
+          <Property Name="IDStatys" Type="int" />
+          <Property Name="DateReg" Type="datetime" />
+          <Property Name="Last_Up" Type="datetime" />
+          <Property Name="Photo" Type="nvarchar" MaxLength="50" />
+          <Property Name="Features" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Tracking">
+          <Key>
+            <PropertyRef Name="IDTracking" />
+          </Key>
+          <Property Name="IDTracking" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDSuitcase" Type="int" />
+          <Property Name="IDFlight" Type="int" />
+          <Property Name="Coordinate" Type="nvarchar" MaxLength="50" />
+          <Property Name="IDStatysTracking" Type="int" />
+          <Property Name="Time" Type="datetime" />
+          <Property Name="Scanned" Type="int" />
+        </EntityType>
+        <EntityType Name="TypeIncident">
+          <Key>
+            <PropertyRef Name="IDTypeIncident" />
+          </Key>
+          <Property Name="IDTypeIncident" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="TypeInspection">
+          <Key>
+            <PropertyRef Name="IDTypeInspection" />
+          </Key>
+          <Property Name="IDTypeInspection" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="IDUser" />
+          </Key>
+          <Property Name="IDUser" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FIO" Type="nvarchar" MaxLength="50" />
+          <Property Name="IDRoles" Type="int" />
+          <Property Name="NumberTicet" Type="int" />
+          <Property Name="Token" Type="nvarchar" MaxLength="50" />
+          <Property Name="Email" Type="nvarchar" MaxLength="50" />
+          <Property Name="Telefon" Type="nvarchar" MaxLength="50" />
+          <Property Name="DateReg" Type="datetime" />
+          <Property Name="DateExit" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_BaggageRegistration_Flight">
+          <End Role="Flight" Type="Self.Flight" Multiplicity="0..1" />
+          <End Role="BaggageRegistration" Type="Self.BaggageRegistration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flight">
+              <PropertyRef Name="IDFlight" />
+            </Principal>
+            <Dependent Role="BaggageRegistration">
+              <PropertyRef Name="IDFlight" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BaggageRegistration_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="BaggageRegistration" Type="Self.BaggageRegistration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="BaggageRegistration">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BaggageRegistration_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="BaggageRegistration" Type="Self.BaggageRegistration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="BaggageRegistration">
+              <PropertyRef Name="Passegir" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BaggageRegistration_User1">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="BaggageRegistration" Type="Self.BaggageRegistration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="BaggageRegistration">
+              <PropertyRef Name="Operator" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackList_Level">
+          <End Role="Level" Type="Self.Level" Multiplicity="0..1" />
+          <End Role="BlackList" Type="Self.BlackList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Level">
+              <PropertyRef Name="IDLevel" />
+            </Principal>
+            <Dependent Role="BlackList">
+              <PropertyRef Name="IDLevel" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackList_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="BlackList" Type="Self.BlackList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="BlackList">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackList_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="BlackList" Type="Self.BlackList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="BlackList">
+              <PropertyRef Name="Owner" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackList_User1">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="BlackList" Type="Self.BlackList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="BlackList">
+              <PropertyRef Name="AddPerson" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConfiscatedItem_CICategory">
+          <End Role="CICategory" Type="Self.CICategory" Multiplicity="0..1" />
+          <End Role="ConfiscatedItem" Type="Self.ConfiscatedItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CICategory">
+              <PropertyRef Name="IDCICategory" />
+            </Principal>
+            <Dependent Role="ConfiscatedItem">
+              <PropertyRef Name="IDCICategory" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConfiscatedItem_DegreeProhibition">
+          <End Role="DegreeProhibition" Type="Self.DegreeProhibition" Multiplicity="0..1" />
+          <End Role="ConfiscatedItem" Type="Self.ConfiscatedItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DegreeProhibition">
+              <PropertyRef Name="IDDegreeProhibition" />
+            </Principal>
+            <Dependent Role="ConfiscatedItem">
+              <PropertyRef Name="IDDegreeProhibition" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConfiscatedItem_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="ConfiscatedItem" Type="Self.ConfiscatedItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="ConfiscatedItem">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConfiscatedItem_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="ConfiscatedItem" Type="Self.ConfiscatedItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="ConfiscatedItem">
+              <PropertyRef Name="Inspector" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Flight_StatysFlight">
+          <End Role="StatysFlight" Type="Self.StatysFlight" Multiplicity="0..1" />
+          <End Role="Flight" Type="Self.Flight" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StatysFlight">
+              <PropertyRef Name="IDStatysFlight" />
+            </Principal>
+            <Dependent Role="Flight">
+              <PropertyRef Name="IDStatysFlight" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Flight_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Flight" Type="Self.Flight" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Flight">
+              <PropertyRef Name="Operator" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_Flight">
+          <End Role="Flight" Type="Self.Flight" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flight">
+              <PropertyRef Name="IDFlight" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="IDFlight" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_StatysTypeIncident">
+          <End Role="StatysTypeIncident" Type="Self.StatysTypeIncident" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StatysTypeIncident">
+              <PropertyRef Name="IDStatysTypeIncident" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="IDStatysTypeIncident" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_TypeIncident">
+          <End Role="TypeIncident" Type="Self.TypeIncident" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TypeIncident">
+              <PropertyRef Name="IDTypeIncident" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="IDTypeIncident" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="Responsible" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Inspection_Result">
+          <End Role="Result" Type="Self.Result" Multiplicity="0..1" />
+          <End Role="Inspection" Type="Self.Inspection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Result">
+              <PropertyRef Name="IDResult" />
+            </Principal>
+            <Dependent Role="Inspection">
+              <PropertyRef Name="IDResult" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Inspection_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="Inspection" Type="Self.Inspection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="Inspection">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Inspection_TypeInspection">
+          <End Role="TypeInspection" Type="Self.TypeInspection" Multiplicity="0..1" />
+          <End Role="Inspection" Type="Self.Inspection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TypeInspection">
+              <PropertyRef Name="IDTypeInspection" />
+            </Principal>
+            <Dependent Role="Inspection">
+              <PropertyRef Name="IDTypeInspection" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Inspection_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Inspection" Type="Self.Inspection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Inspection">
+              <PropertyRef Name="Inspector" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Suitcase_DegreeDanger">
+          <End Role="DegreeDanger" Type="Self.DegreeDanger" Multiplicity="0..1" />
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DegreeDanger">
+              <PropertyRef Name="IDDegreeDanger" />
+            </Principal>
+            <Dependent Role="Suitcase">
+              <PropertyRef Name="IDDegreeDanger" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Suitcase_Statys">
+          <End Role="Statys" Type="Self.Statys" Multiplicity="0..1" />
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Statys">
+              <PropertyRef Name="IDStatys" />
+            </Principal>
+            <Dependent Role="Suitcase">
+              <PropertyRef Name="IDStatys" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Suitcase_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Suitcase">
+              <PropertyRef Name="Owner" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_Flight">
+          <End Role="Flight" Type="Self.Flight" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flight">
+              <PropertyRef Name="IDFlight" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="IDFlight" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_StatysTracking">
+          <End Role="StatysTracking" Type="Self.StatysTracking" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StatysTracking">
+              <PropertyRef Name="IDStatysTracking" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="IDStatysTracking" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="Scanned" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_User1">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="Scanned" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="0..1" />
+          <End Role="User" Type="Self.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="IDRoles" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="IDRoles" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Хранилище SuitcaseRegistryModelContainer">
+          <EntitySet Name="BaggageRegistration" EntityType="Self.BaggageRegistration" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BlackList" EntityType="Self.BlackList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CICategory" EntityType="Self.CICategory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ConfiscatedItem" EntityType="Self.ConfiscatedItem" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DegreeDanger" EntityType="Self.DegreeDanger" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DegreeProhibition" EntityType="Self.DegreeProhibition" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Flight" EntityType="Self.Flight" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Incident" EntityType="Self.Incident" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Inspection" EntityType="Self.Inspection" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Level" EntityType="Self.Level" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Result" EntityType="Self.Result" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Statys" EntityType="Self.Statys" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StatysFlight" EntityType="Self.StatysFlight" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StatysTracking" EntityType="Self.StatysTracking" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StatysTypeIncident" EntityType="Self.StatysTypeIncident" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Suitcase" EntityType="Self.Suitcase" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Tracking" EntityType="Self.Tracking" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TypeIncident" EntityType="Self.TypeIncident" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TypeInspection" EntityType="Self.TypeInspection" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_BaggageRegistration_Flight" Association="Self.FK_BaggageRegistration_Flight">
+            <End Role="Flight" EntitySet="Flight" />
+            <End Role="BaggageRegistration" EntitySet="BaggageRegistration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BaggageRegistration_Suitcase" Association="Self.FK_BaggageRegistration_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="BaggageRegistration" EntitySet="BaggageRegistration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BaggageRegistration_User" Association="Self.FK_BaggageRegistration_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="BaggageRegistration" EntitySet="BaggageRegistration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BaggageRegistration_User1" Association="Self.FK_BaggageRegistration_User1">
+            <End Role="User" EntitySet="User" />
+            <End Role="BaggageRegistration" EntitySet="BaggageRegistration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackList_Level" Association="Self.FK_BlackList_Level">
+            <End Role="Level" EntitySet="Level" />
+            <End Role="BlackList" EntitySet="BlackList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackList_Suitcase" Association="Self.FK_BlackList_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="BlackList" EntitySet="BlackList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackList_User" Association="Self.FK_BlackList_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="BlackList" EntitySet="BlackList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackList_User1" Association="Self.FK_BlackList_User1">
+            <End Role="User" EntitySet="User" />
+            <End Role="BlackList" EntitySet="BlackList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConfiscatedItem_CICategory" Association="Self.FK_ConfiscatedItem_CICategory">
+            <End Role="CICategory" EntitySet="CICategory" />
+            <End Role="ConfiscatedItem" EntitySet="ConfiscatedItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConfiscatedItem_DegreeProhibition" Association="Self.FK_ConfiscatedItem_DegreeProhibition">
+            <End Role="DegreeProhibition" EntitySet="DegreeProhibition" />
+            <End Role="ConfiscatedItem" EntitySet="ConfiscatedItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConfiscatedItem_Suitcase" Association="Self.FK_ConfiscatedItem_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="ConfiscatedItem" EntitySet="ConfiscatedItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConfiscatedItem_User" Association="Self.FK_ConfiscatedItem_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="ConfiscatedItem" EntitySet="ConfiscatedItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Flight_StatysFlight" Association="Self.FK_Flight_StatysFlight">
+            <End Role="StatysFlight" EntitySet="StatysFlight" />
+            <End Role="Flight" EntitySet="Flight" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Flight_User" Association="Self.FK_Flight_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Flight" EntitySet="Flight" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_Flight" Association="Self.FK_Incident_Flight">
+            <End Role="Flight" EntitySet="Flight" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_StatysTypeIncident" Association="Self.FK_Incident_StatysTypeIncident">
+            <End Role="StatysTypeIncident" EntitySet="StatysTypeIncident" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_Suitcase" Association="Self.FK_Incident_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_TypeIncident" Association="Self.FK_Incident_TypeIncident">
+            <End Role="TypeIncident" EntitySet="TypeIncident" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_User" Association="Self.FK_Incident_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inspection_Result" Association="Self.FK_Inspection_Result">
+            <End Role="Result" EntitySet="Result" />
+            <End Role="Inspection" EntitySet="Inspection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inspection_Suitcase" Association="Self.FK_Inspection_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="Inspection" EntitySet="Inspection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inspection_TypeInspection" Association="Self.FK_Inspection_TypeInspection">
+            <End Role="TypeInspection" EntitySet="TypeInspection" />
+            <End Role="Inspection" EntitySet="Inspection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inspection_User" Association="Self.FK_Inspection_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Inspection" EntitySet="Inspection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Suitcase_DegreeDanger" Association="Self.FK_Suitcase_DegreeDanger">
+            <End Role="DegreeDanger" EntitySet="DegreeDanger" />
+            <End Role="Suitcase" EntitySet="Suitcase" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Suitcase_Statys" Association="Self.FK_Suitcase_Statys">
+            <End Role="Statys" EntitySet="Statys" />
+            <End Role="Suitcase" EntitySet="Suitcase" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Suitcase_User" Association="Self.FK_Suitcase_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Suitcase" EntitySet="Suitcase" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_Flight" Association="Self.FK_Tracking_Flight">
+            <End Role="Flight" EntitySet="Flight" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_StatysTracking" Association="Self.FK_Tracking_StatysTracking">
+            <End Role="StatysTracking" EntitySet="StatysTracking" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_Suitcase" Association="Self.FK_Tracking_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_User" Association="Self.FK_Tracking_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_User1" Association="Self.FK_Tracking_User1">
+            <End Role="User" EntitySet="User" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Roles" Association="Self.FK_User_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="User" EntitySet="User" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SuitcaseRegistryModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="BaggageRegistration">
+          <Key>
+            <PropertyRef Name="IDBagReg" />
+          </Key>
+          <Property Name="IDBagReg" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSuitcase" Type="Int32" />
+          <Property Name="IDFlight" Type="Int32" />
+          <Property Name="Passegir" Type="Int32" />
+          <Property Name="WeightReg" Type="Int32" />
+          <Property Name="DateReg" Type="DateTime" Precision="3" />
+          <Property Name="ReceptionDesk" Type="Int32" />
+          <Property Name="Operator" Type="Int32" />
+          <Property Name="Cheque" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Flight" Relationship="Self.FK_BaggageRegistration_Flight" FromRole="BaggageRegistration" ToRole="Flight" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_BaggageRegistration_Suitcase" FromRole="BaggageRegistration" ToRole="Suitcase" />
+          <NavigationProperty Name="User" Relationship="Self.FK_BaggageRegistration_User" FromRole="BaggageRegistration" ToRole="User" />
+          <NavigationProperty Name="User1" Relationship="Self.FK_BaggageRegistration_User1" FromRole="BaggageRegistration" ToRole="User" />
+        </EntityType>
+        <EntityType Name="BlackList">
+          <Key>
+            <PropertyRef Name="IDBlackList" />
+          </Key>
+          <Property Name="IDBlackList" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSuitcase" Type="Int32" />
+          <Property Name="Owner" Type="Int32" />
+          <Property Name="Reason" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IDLevel" Type="Int32" />
+          <Property Name="DateADD" Type="DateTime" Precision="3" />
+          <Property Name="AddPerson" Type="Int32" />
+          <Property Name="ValidityPeriod" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Level" Relationship="Self.FK_BlackList_Level" FromRole="BlackList" ToRole="Level" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_BlackList_Suitcase" FromRole="BlackList" ToRole="Suitcase" />
+          <NavigationProperty Name="User" Relationship="Self.FK_BlackList_User" FromRole="BlackList" ToRole="User" />
+          <NavigationProperty Name="User1" Relationship="Self.FK_BlackList_User1" FromRole="BlackList" ToRole="User" />
+        </EntityType>
+        <EntityType Name="CICategory">
+          <Key>
+            <PropertyRef Name="IDCICategory" />
+          </Key>
+          <Property Name="IDCICategory" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ConfiscatedItem" Relationship="Self.FK_ConfiscatedItem_CICategory" FromRole="CICategory" ToRole="ConfiscatedItem" />
+        </EntityType>
+        <EntityType Name="ConfiscatedItem">
+          <Key>
+            <PropertyRef Name="IDConfiscatedItem" />
+          </Key>
+          <Property Name="IDConfiscatedItem" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSuitcase" Type="Int32" />
+          <Property Name="Inspector" Type="Int32" />
+          <Property Name="Subject" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="IDCICategory" Type="Int32" />
+          <Property Name="IDDegreeProhibition" Type="Int32" />
+          <Property Name="Quantity" Type="Int32" />
+          <Property Name="Measurement" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DateConfiscation" Type="DateTime" Precision="3" />
+          <Property Name="Storagelocation" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Destroyed" Type="Int32" />
+          <Property Name="DateDestroyed" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="CICategory" Relationship="Self.FK_ConfiscatedItem_CICategory" FromRole="ConfiscatedItem" ToRole="CICategory" />
+          <NavigationProperty Name="DegreeProhibition" Relationship="Self.FK_ConfiscatedItem_DegreeProhibition" FromRole="ConfiscatedItem" ToRole="DegreeProhibition" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_ConfiscatedItem_Suitcase" FromRole="ConfiscatedItem" ToRole="Suitcase" />
+          <NavigationProperty Name="User" Relationship="Self.FK_ConfiscatedItem_User" FromRole="ConfiscatedItem" ToRole="User" />
+        </EntityType>
+        <EntityType Name="DegreeDanger">
+          <Key>
+            <PropertyRef Name="IDDegreeDanger" />
+          </Key>
+          <Property Name="IDDegreeDanger" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_Suitcase_DegreeDanger" FromRole="DegreeDanger" ToRole="Suitcase" />
+        </EntityType>
+        <EntityType Name="DegreeProhibition">
+          <Key>
+            <PropertyRef Name="IDDegreeProhibition" />
+          </Key>
+          <Property Name="IDDegreeProhibition" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ConfiscatedItem" Relationship="Self.FK_ConfiscatedItem_DegreeProhibition" FromRole="DegreeProhibition" ToRole="ConfiscatedItem" />
+        </EntityType>
+        <EntityType Name="Flight">
+          <Key>
+            <PropertyRef Name="IDFlight" />
+          </Key>
+          <Property Name="IDFlight" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DestinationPortal" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DateTime" Type="DateTime" Precision="3" />
+          <Property Name="IDStatysFlight" Type="Int32" />
+          <Property Name="Operator" Type="Int32" />
+          <Property Name="NumberSuitcases" Type="Int32" />
+          <Property Name="Note" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="BaggageRegistration" Relationship="Self.FK_BaggageRegistration_Flight" FromRole="Flight" ToRole="BaggageRegistration" />
+          <NavigationProperty Name="StatysFlight" Relationship="Self.FK_Flight_StatysFlight" FromRole="Flight" ToRole="StatysFlight" />
+          <NavigationProperty Name="User" Relationship="Self.FK_Flight_User" FromRole="Flight" ToRole="User" />
+          <NavigationProperty Name="Incident" Relationship="Self.FK_Incident_Flight" FromRole="Flight" ToRole="Incident" />
+          <NavigationProperty Name="Tracking" Relationship="Self.FK_Tracking_Flight" FromRole="Flight" ToRole="Tracking" />
+        </EntityType>
+        <EntityType Name="Incident">
+          <Key>
+            <PropertyRef Name="IDIncident" />
+          </Key>
+          <Property Name="IDIncident" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSuitcase" Type="Int32" />
+          <Property Name="IDFlight" Type="Int32" />
+          <Property Name="IDTypeIncident" Type="Int32" />
+          <Property Name="Date" Type="DateTime" Precision="3" />
+          <Property Name="Place" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IDStatysTypeIncident" Type="Int32" />
+          <Property Name="Responsible" Type="Int32" />
+          <Property Name="Damage" Type="Int32" />
+          <NavigationProperty Name="Flight" Relationship="Self.FK_Incident_Flight" FromRole="Incident" ToRole="Flight" />
+          <NavigationProperty Name="StatysTypeIncident" Relationship="Self.FK_Incident_StatysTypeIncident" FromRole="Incident" ToRole="StatysTypeIncident" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_Incident_Suitcase" FromRole="Incident" ToRole="Suitcase" />
+          <NavigationProperty Name="TypeIncident" Relationship="Self.FK_Incident_TypeIncident" FromRole="Incident" ToRole="TypeIncident" />
+          <NavigationProperty Name="User" Relationship="Self.FK_Incident_User" FromRole="Incident" ToRole="User" />
+        </EntityType>
+        <EntityType Name="Inspection">
+          <Key>
+            <PropertyRef Name="IDInspection" />
+          </Key>
+          <Property Name="IDInspection" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSuitcase" Type="Int32" />
+          <Property Name="Inspector" Type="Int32" />
+          <Property Name="Date" Type="DateTime" Precision="3" />
+          <Property Name="IDTypeInspection" Type="Int32" />
+          <Property Name="IDResult" Type="Int32" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Conclusion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PhotoEvidence" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Result" Relationship="Self.FK_Inspection_Result" FromRole="Inspection" ToRole="Result" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_Inspection_Suitcase" FromRole="Inspection" ToRole="Suitcase" />
+          <NavigationProperty Name="TypeInspection" Relationship="Self.FK_Inspection_TypeInspection" FromRole="Inspection" ToRole="TypeInspection" />
+          <NavigationProperty Name="User" Relationship="Self.FK_Inspection_User" FromRole="Inspection" ToRole="User" />
+        </EntityType>
+        <EntityType Name="Level">
+          <Key>
+            <PropertyRef Name="IDLevel" />
+          </Key>
+          <Property Name="IDLevel" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="BlackList" Relationship="Self.FK_BlackList_Level" FromRole="Level" ToRole="BlackList" />
+        </EntityType>
+        <EntityType Name="Result">
+          <Key>
+            <PropertyRef Name="IDResult" />
+          </Key>
+          <Property Name="IDResult" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Inspection" Relationship="Self.FK_Inspection_Result" FromRole="Result" ToRole="Inspection" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="IDRoles" />
+          </Key>
+          <Property Name="IDRoles" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="User" Relationship="Self.FK_User_Roles" FromRole="Roles" ToRole="User" />
+        </EntityType>
+        <EntityType Name="Statys">
+          <Key>
+            <PropertyRef Name="IDStatys" />
+          </Key>
+          <Property Name="IDStatys" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_Suitcase_Statys" FromRole="Statys" ToRole="Suitcase" />
+        </EntityType>
+        <EntityType Name="StatysFlight">
+          <Key>
+            <PropertyRef Name="IDStatysFlight" />
+          </Key>
+          <Property Name="IDStatysFlight" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Flight" Relationship="Self.FK_Flight_StatysFlight" FromRole="StatysFlight" ToRole="Flight" />
+        </EntityType>
+        <EntityType Name="StatysTracking">
+          <Key>
+            <PropertyRef Name="IDStatysTracking" />
+          </Key>
+          <Property Name="IDStatysTracking" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Tracking" Relationship="Self.FK_Tracking_StatysTracking" FromRole="StatysTracking" ToRole="Tracking" />
+        </EntityType>
+        <EntityType Name="StatysTypeIncident">
+          <Key>
+            <PropertyRef Name="IDStatysTypeIncident" />
+          </Key>
+          <Property Name="IDStatysTypeIncident" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Incident" Relationship="Self.FK_Incident_StatysTypeIncident" FromRole="StatysTypeIncident" ToRole="Incident" />
+        </EntityType>
+        <EntityType Name="Suitcase">
+          <Key>
+            <PropertyRef Name="IDSuitcase" />
+          </Key>
+          <Property Name="IDSuitcase" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="QRKod" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Owner" Type="Int32" />
+          <Property Name="Model" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Colour" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+          <Property Name="Matireal" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Weight" Type="Int32" />
+          <Property Name="IDDegreeDanger" Type="Int32" />
+          <Property Name="SignDanger" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IDStatys" Type="Int32" />
+          <Property Name="DateReg" Type="DateTime" Precision="3" />
+          <Property Name="Last_Up" Type="DateTime" Precision="3" />
+          <Property Name="Photo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Features" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="BaggageRegistration" Relationship="Self.FK_BaggageRegistration_Suitcase" FromRole="Suitcase" ToRole="BaggageRegistration" />
+          <NavigationProperty Name="BlackList" Relationship="Self.FK_BlackList_Suitcase" FromRole="Suitcase" ToRole="BlackList" />
+          <NavigationProperty Name="ConfiscatedItem" Relationship="Self.FK_ConfiscatedItem_Suitcase" FromRole="Suitcase" ToRole="ConfiscatedItem" />
+          <NavigationProperty Name="DegreeDanger" Relationship="Self.FK_Suitcase_DegreeDanger" FromRole="Suitcase" ToRole="DegreeDanger" />
+          <NavigationProperty Name="Incident" Relationship="Self.FK_Incident_Suitcase" FromRole="Suitcase" ToRole="Incident" />
+          <NavigationProperty Name="Inspection" Relationship="Self.FK_Inspection_Suitcase" FromRole="Suitcase" ToRole="Inspection" />
+          <NavigationProperty Name="Statys" Relationship="Self.FK_Suitcase_Statys" FromRole="Suitcase" ToRole="Statys" />
+          <NavigationProperty Name="User" Relationship="Self.FK_Suitcase_User" FromRole="Suitcase" ToRole="User" />
+          <NavigationProperty Name="Tracking" Relationship="Self.FK_Tracking_Suitcase" FromRole="Suitcase" ToRole="Tracking" />
+        </EntityType>
+        <EntityType Name="Tracking">
+          <Key>
+            <PropertyRef Name="IDTracking" />
+          </Key>
+          <Property Name="IDTracking" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDSuitcase" Type="Int32" />
+          <Property Name="IDFlight" Type="Int32" />
+          <Property Name="Coordinate" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="IDStatysTracking" Type="Int32" />
+          <Property Name="Time" Type="DateTime" Precision="3" />
+          <Property Name="Scanned" Type="Int32" />
+          <NavigationProperty Name="Flight" Relationship="Self.FK_Tracking_Flight" FromRole="Tracking" ToRole="Flight" />
+          <NavigationProperty Name="StatysTracking" Relationship="Self.FK_Tracking_StatysTracking" FromRole="Tracking" ToRole="StatysTracking" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_Tracking_Suitcase" FromRole="Tracking" ToRole="Suitcase" />
+          <NavigationProperty Name="User" Relationship="Self.FK_Tracking_User" FromRole="Tracking" ToRole="User" />
+          <NavigationProperty Name="User1" Relationship="Self.FK_Tracking_User1" FromRole="Tracking" ToRole="User" />
+        </EntityType>
+        <EntityType Name="TypeIncident">
+          <Key>
+            <PropertyRef Name="IDTypeIncident" />
+          </Key>
+          <Property Name="IDTypeIncident" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Incident" Relationship="Self.FK_Incident_TypeIncident" FromRole="TypeIncident" ToRole="Incident" />
+        </EntityType>
+        <EntityType Name="TypeInspection">
+          <Key>
+            <PropertyRef Name="IDTypeInspection" />
+          </Key>
+          <Property Name="IDTypeInspection" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Inspection" Relationship="Self.FK_Inspection_TypeInspection" FromRole="TypeInspection" ToRole="Inspection" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="IDUser" />
+          </Key>
+          <Property Name="IDUser" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FIO" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="IDRoles" Type="Int32" />
+          <Property Name="NumberTicet" Type="Int32" />
+          <Property Name="Token" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Telefon" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DateReg" Type="DateTime" Precision="3" />
+          <Property Name="DateExit" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="BaggageRegistration" Relationship="Self.FK_BaggageRegistration_User" FromRole="User" ToRole="BaggageRegistration" />
+          <NavigationProperty Name="BaggageRegistration1" Relationship="Self.FK_BaggageRegistration_User1" FromRole="User" ToRole="BaggageRegistration" />
+          <NavigationProperty Name="BlackList" Relationship="Self.FK_BlackList_User" FromRole="User" ToRole="BlackList" />
+          <NavigationProperty Name="BlackList1" Relationship="Self.FK_BlackList_User1" FromRole="User" ToRole="BlackList" />
+          <NavigationProperty Name="ConfiscatedItem" Relationship="Self.FK_ConfiscatedItem_User" FromRole="User" ToRole="ConfiscatedItem" />
+          <NavigationProperty Name="Flight" Relationship="Self.FK_Flight_User" FromRole="User" ToRole="Flight" />
+          <NavigationProperty Name="Incident" Relationship="Self.FK_Incident_User" FromRole="User" ToRole="Incident" />
+          <NavigationProperty Name="Inspection" Relationship="Self.FK_Inspection_User" FromRole="User" ToRole="Inspection" />
+          <NavigationProperty Name="Roles" Relationship="Self.FK_User_Roles" FromRole="User" ToRole="Roles" />
+          <NavigationProperty Name="Suitcase" Relationship="Self.FK_Suitcase_User" FromRole="User" ToRole="Suitcase" />
+          <NavigationProperty Name="Tracking" Relationship="Self.FK_Tracking_User" FromRole="User" ToRole="Tracking" />
+          <NavigationProperty Name="Tracking1" Relationship="Self.FK_Tracking_User1" FromRole="User" ToRole="Tracking" />
+        </EntityType>
+        <Association Name="FK_BaggageRegistration_Flight">
+          <End Role="Flight" Type="Self.Flight" Multiplicity="0..1" />
+          <End Role="BaggageRegistration" Type="Self.BaggageRegistration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flight">
+              <PropertyRef Name="IDFlight" />
+            </Principal>
+            <Dependent Role="BaggageRegistration">
+              <PropertyRef Name="IDFlight" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BaggageRegistration_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="BaggageRegistration" Type="Self.BaggageRegistration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="BaggageRegistration">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BaggageRegistration_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="BaggageRegistration" Type="Self.BaggageRegistration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="BaggageRegistration">
+              <PropertyRef Name="Passegir" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BaggageRegistration_User1">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="BaggageRegistration" Type="Self.BaggageRegistration" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="BaggageRegistration">
+              <PropertyRef Name="Operator" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackList_Level">
+          <End Role="Level" Type="Self.Level" Multiplicity="0..1" />
+          <End Role="BlackList" Type="Self.BlackList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Level">
+              <PropertyRef Name="IDLevel" />
+            </Principal>
+            <Dependent Role="BlackList">
+              <PropertyRef Name="IDLevel" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackList_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="BlackList" Type="Self.BlackList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="BlackList">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackList_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="BlackList" Type="Self.BlackList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="BlackList">
+              <PropertyRef Name="Owner" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlackList_User1">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="BlackList" Type="Self.BlackList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="BlackList">
+              <PropertyRef Name="AddPerson" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConfiscatedItem_CICategory">
+          <End Role="CICategory" Type="Self.CICategory" Multiplicity="0..1" />
+          <End Role="ConfiscatedItem" Type="Self.ConfiscatedItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CICategory">
+              <PropertyRef Name="IDCICategory" />
+            </Principal>
+            <Dependent Role="ConfiscatedItem">
+              <PropertyRef Name="IDCICategory" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConfiscatedItem_DegreeProhibition">
+          <End Role="DegreeProhibition" Type="Self.DegreeProhibition" Multiplicity="0..1" />
+          <End Role="ConfiscatedItem" Type="Self.ConfiscatedItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DegreeProhibition">
+              <PropertyRef Name="IDDegreeProhibition" />
+            </Principal>
+            <Dependent Role="ConfiscatedItem">
+              <PropertyRef Name="IDDegreeProhibition" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConfiscatedItem_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="ConfiscatedItem" Type="Self.ConfiscatedItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="ConfiscatedItem">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ConfiscatedItem_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="ConfiscatedItem" Type="Self.ConfiscatedItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="ConfiscatedItem">
+              <PropertyRef Name="Inspector" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Suitcase_DegreeDanger">
+          <End Role="DegreeDanger" Type="Self.DegreeDanger" Multiplicity="0..1" />
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DegreeDanger">
+              <PropertyRef Name="IDDegreeDanger" />
+            </Principal>
+            <Dependent Role="Suitcase">
+              <PropertyRef Name="IDDegreeDanger" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Flight_StatysFlight">
+          <End Role="StatysFlight" Type="Self.StatysFlight" Multiplicity="0..1" />
+          <End Role="Flight" Type="Self.Flight" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StatysFlight">
+              <PropertyRef Name="IDStatysFlight" />
+            </Principal>
+            <Dependent Role="Flight">
+              <PropertyRef Name="IDStatysFlight" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Flight_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Flight" Type="Self.Flight" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Flight">
+              <PropertyRef Name="Operator" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_Flight">
+          <End Role="Flight" Type="Self.Flight" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flight">
+              <PropertyRef Name="IDFlight" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="IDFlight" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_Flight">
+          <End Role="Flight" Type="Self.Flight" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Flight">
+              <PropertyRef Name="IDFlight" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="IDFlight" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_StatysTypeIncident">
+          <End Role="StatysTypeIncident" Type="Self.StatysTypeIncident" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StatysTypeIncident">
+              <PropertyRef Name="IDStatysTypeIncident" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="IDStatysTypeIncident" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_TypeIncident">
+          <End Role="TypeIncident" Type="Self.TypeIncident" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TypeIncident">
+              <PropertyRef Name="IDTypeIncident" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="IDTypeIncident" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Incident_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Incident" Type="Self.Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="Responsible" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Inspection_Result">
+          <End Role="Result" Type="Self.Result" Multiplicity="0..1" />
+          <End Role="Inspection" Type="Self.Inspection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Result">
+              <PropertyRef Name="IDResult" />
+            </Principal>
+            <Dependent Role="Inspection">
+              <PropertyRef Name="IDResult" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Inspection_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="Inspection" Type="Self.Inspection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="Inspection">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Inspection_TypeInspection">
+          <End Role="TypeInspection" Type="Self.TypeInspection" Multiplicity="0..1" />
+          <End Role="Inspection" Type="Self.Inspection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TypeInspection">
+              <PropertyRef Name="IDTypeInspection" />
+            </Principal>
+            <Dependent Role="Inspection">
+              <PropertyRef Name="IDTypeInspection" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Inspection_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Inspection" Type="Self.Inspection" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Inspection">
+              <PropertyRef Name="Inspector" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="0..1" />
+          <End Role="User" Type="Self.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="IDRoles" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="IDRoles" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Suitcase_Statys">
+          <End Role="Statys" Type="Self.Statys" Multiplicity="0..1" />
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Statys">
+              <PropertyRef Name="IDStatys" />
+            </Principal>
+            <Dependent Role="Suitcase">
+              <PropertyRef Name="IDStatys" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_StatysTracking">
+          <End Role="StatysTracking" Type="Self.StatysTracking" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StatysTracking">
+              <PropertyRef Name="IDStatysTracking" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="IDStatysTracking" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Suitcase_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Suitcase">
+              <PropertyRef Name="Owner" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_Suitcase">
+          <End Role="Suitcase" Type="Self.Suitcase" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suitcase">
+              <PropertyRef Name="IDSuitcase" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="IDSuitcase" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="Scanned" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Tracking_User1">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Tracking" Type="Self.Tracking" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="IDUser" />
+            </Principal>
+            <Dependent Role="Tracking">
+              <PropertyRef Name="Scanned" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="SuitcaseRegistryEntities2" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BaggageRegistration" EntityType="Self.BaggageRegistration" />
+          <EntitySet Name="BlackList" EntityType="Self.BlackList" />
+          <EntitySet Name="CICategory" EntityType="Self.CICategory" />
+          <EntitySet Name="ConfiscatedItem" EntityType="Self.ConfiscatedItem" />
+          <EntitySet Name="DegreeDanger" EntityType="Self.DegreeDanger" />
+          <EntitySet Name="DegreeProhibition" EntityType="Self.DegreeProhibition" />
+          <EntitySet Name="Flight" EntityType="Self.Flight" />
+          <EntitySet Name="Incident" EntityType="Self.Incident" />
+          <EntitySet Name="Inspection" EntityType="Self.Inspection" />
+          <EntitySet Name="Level" EntityType="Self.Level" />
+          <EntitySet Name="Result" EntityType="Self.Result" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" />
+          <EntitySet Name="Statys" EntityType="Self.Statys" />
+          <EntitySet Name="StatysFlight" EntityType="Self.StatysFlight" />
+          <EntitySet Name="StatysTracking" EntityType="Self.StatysTracking" />
+          <EntitySet Name="StatysTypeIncident" EntityType="Self.StatysTypeIncident" />
+          <EntitySet Name="Suitcase" EntityType="Self.Suitcase" />
+          <EntitySet Name="Tracking" EntityType="Self.Tracking" />
+          <EntitySet Name="TypeIncident" EntityType="Self.TypeIncident" />
+          <EntitySet Name="TypeInspection" EntityType="Self.TypeInspection" />
+          <EntitySet Name="User" EntityType="Self.User" />
+          <AssociationSet Name="FK_BaggageRegistration_Flight" Association="Self.FK_BaggageRegistration_Flight">
+            <End Role="Flight" EntitySet="Flight" />
+            <End Role="BaggageRegistration" EntitySet="BaggageRegistration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BaggageRegistration_Suitcase" Association="Self.FK_BaggageRegistration_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="BaggageRegistration" EntitySet="BaggageRegistration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BaggageRegistration_User" Association="Self.FK_BaggageRegistration_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="BaggageRegistration" EntitySet="BaggageRegistration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BaggageRegistration_User1" Association="Self.FK_BaggageRegistration_User1">
+            <End Role="User" EntitySet="User" />
+            <End Role="BaggageRegistration" EntitySet="BaggageRegistration" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackList_Level" Association="Self.FK_BlackList_Level">
+            <End Role="Level" EntitySet="Level" />
+            <End Role="BlackList" EntitySet="BlackList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackList_Suitcase" Association="Self.FK_BlackList_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="BlackList" EntitySet="BlackList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackList_User" Association="Self.FK_BlackList_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="BlackList" EntitySet="BlackList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlackList_User1" Association="Self.FK_BlackList_User1">
+            <End Role="User" EntitySet="User" />
+            <End Role="BlackList" EntitySet="BlackList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConfiscatedItem_CICategory" Association="Self.FK_ConfiscatedItem_CICategory">
+            <End Role="CICategory" EntitySet="CICategory" />
+            <End Role="ConfiscatedItem" EntitySet="ConfiscatedItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConfiscatedItem_DegreeProhibition" Association="Self.FK_ConfiscatedItem_DegreeProhibition">
+            <End Role="DegreeProhibition" EntitySet="DegreeProhibition" />
+            <End Role="ConfiscatedItem" EntitySet="ConfiscatedItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConfiscatedItem_Suitcase" Association="Self.FK_ConfiscatedItem_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="ConfiscatedItem" EntitySet="ConfiscatedItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ConfiscatedItem_User" Association="Self.FK_ConfiscatedItem_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="ConfiscatedItem" EntitySet="ConfiscatedItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Suitcase_DegreeDanger" Association="Self.FK_Suitcase_DegreeDanger">
+            <End Role="DegreeDanger" EntitySet="DegreeDanger" />
+            <End Role="Suitcase" EntitySet="Suitcase" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Flight_StatysFlight" Association="Self.FK_Flight_StatysFlight">
+            <End Role="StatysFlight" EntitySet="StatysFlight" />
+            <End Role="Flight" EntitySet="Flight" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Flight_User" Association="Self.FK_Flight_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Flight" EntitySet="Flight" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_Flight" Association="Self.FK_Incident_Flight">
+            <End Role="Flight" EntitySet="Flight" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_Flight" Association="Self.FK_Tracking_Flight">
+            <End Role="Flight" EntitySet="Flight" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_StatysTypeIncident" Association="Self.FK_Incident_StatysTypeIncident">
+            <End Role="StatysTypeIncident" EntitySet="StatysTypeIncident" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_Suitcase" Association="Self.FK_Incident_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_TypeIncident" Association="Self.FK_Incident_TypeIncident">
+            <End Role="TypeIncident" EntitySet="TypeIncident" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Incident_User" Association="Self.FK_Incident_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Incident" EntitySet="Incident" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inspection_Result" Association="Self.FK_Inspection_Result">
+            <End Role="Result" EntitySet="Result" />
+            <End Role="Inspection" EntitySet="Inspection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inspection_Suitcase" Association="Self.FK_Inspection_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="Inspection" EntitySet="Inspection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inspection_TypeInspection" Association="Self.FK_Inspection_TypeInspection">
+            <End Role="TypeInspection" EntitySet="TypeInspection" />
+            <End Role="Inspection" EntitySet="Inspection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Inspection_User" Association="Self.FK_Inspection_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Inspection" EntitySet="Inspection" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User_Roles" Association="Self.FK_User_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="User" EntitySet="User" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Suitcase_Statys" Association="Self.FK_Suitcase_Statys">
+            <End Role="Statys" EntitySet="Statys" />
+            <End Role="Suitcase" EntitySet="Suitcase" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_StatysTracking" Association="Self.FK_Tracking_StatysTracking">
+            <End Role="StatysTracking" EntitySet="StatysTracking" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Suitcase_User" Association="Self.FK_Suitcase_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Suitcase" EntitySet="Suitcase" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_Suitcase" Association="Self.FK_Tracking_Suitcase">
+            <End Role="Suitcase" EntitySet="Suitcase" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_User" Association="Self.FK_Tracking_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Tracking_User1" Association="Self.FK_Tracking_User1">
+            <End Role="User" EntitySet="User" />
+            <End Role="Tracking" EntitySet="Tracking" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище SuitcaseRegistryModelContainer" CdmEntityContainer="SuitcaseRegistryEntities2">
+          <EntitySetMapping Name="BaggageRegistration">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.BaggageRegistration">
+              <MappingFragment StoreEntitySet="BaggageRegistration">
+                <ScalarProperty Name="IDBagReg" ColumnName="IDBagReg" />
+                <ScalarProperty Name="IDSuitcase" ColumnName="IDSuitcase" />
+                <ScalarProperty Name="IDFlight" ColumnName="IDFlight" />
+                <ScalarProperty Name="Passegir" ColumnName="Passegir" />
+                <ScalarProperty Name="WeightReg" ColumnName="WeightReg" />
+                <ScalarProperty Name="DateReg" ColumnName="DateReg" />
+                <ScalarProperty Name="ReceptionDesk" ColumnName="ReceptionDesk" />
+                <ScalarProperty Name="Operator" ColumnName="Operator" />
+                <ScalarProperty Name="Cheque" ColumnName="Cheque" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BlackList">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.BlackList">
+              <MappingFragment StoreEntitySet="BlackList">
+                <ScalarProperty Name="IDBlackList" ColumnName="IDBlackList" />
+                <ScalarProperty Name="IDSuitcase" ColumnName="IDSuitcase" />
+                <ScalarProperty Name="Owner" ColumnName="Owner" />
+                <ScalarProperty Name="Reason" ColumnName="Reason" />
+                <ScalarProperty Name="IDLevel" ColumnName="IDLevel" />
+                <ScalarProperty Name="DateADD" ColumnName="DateADD" />
+                <ScalarProperty Name="AddPerson" ColumnName="AddPerson" />
+                <ScalarProperty Name="ValidityPeriod" ColumnName="ValidityPeriod" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CICategory">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.CICategory">
+              <MappingFragment StoreEntitySet="CICategory">
+                <ScalarProperty Name="IDCICategory" ColumnName="IDCICategory" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ConfiscatedItem">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.ConfiscatedItem">
+              <MappingFragment StoreEntitySet="ConfiscatedItem">
+                <ScalarProperty Name="IDConfiscatedItem" ColumnName="IDConfiscatedItem" />
+                <ScalarProperty Name="IDSuitcase" ColumnName="IDSuitcase" />
+                <ScalarProperty Name="Inspector" ColumnName="Inspector" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="IDCICategory" ColumnName="IDCICategory" />
+                <ScalarProperty Name="IDDegreeProhibition" ColumnName="IDDegreeProhibition" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="Measurement" ColumnName="Measurement" />
+                <ScalarProperty Name="DateConfiscation" ColumnName="DateConfiscation" />
+                <ScalarProperty Name="Storagelocation" ColumnName="Storagelocation" />
+                <ScalarProperty Name="Destroyed" ColumnName="Destroyed" />
+                <ScalarProperty Name="DateDestroyed" ColumnName="DateDestroyed" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DegreeDanger">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.DegreeDanger">
+              <MappingFragment StoreEntitySet="DegreeDanger">
+                <ScalarProperty Name="IDDegreeDanger" ColumnName="IDDegreeDanger" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DegreeProhibition">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.DegreeProhibition">
+              <MappingFragment StoreEntitySet="DegreeProhibition">
+                <ScalarProperty Name="IDDegreeProhibition" ColumnName="IDDegreeProhibition" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Flight">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Flight">
+              <MappingFragment StoreEntitySet="Flight">
+                <ScalarProperty Name="IDFlight" ColumnName="IDFlight" />
+                <ScalarProperty Name="DestinationPortal" ColumnName="DestinationPortal" />
+                <ScalarProperty Name="DateTime" ColumnName="DateTime" />
+                <ScalarProperty Name="IDStatysFlight" ColumnName="IDStatysFlight" />
+                <ScalarProperty Name="Operator" ColumnName="Operator" />
+                <ScalarProperty Name="NumberSuitcases" ColumnName="NumberSuitcases" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Incident">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Incident">
+              <MappingFragment StoreEntitySet="Incident">
+                <ScalarProperty Name="IDIncident" ColumnName="IDIncident" />
+                <ScalarProperty Name="IDSuitcase" ColumnName="IDSuitcase" />
+                <ScalarProperty Name="IDFlight" ColumnName="IDFlight" />
+                <ScalarProperty Name="IDTypeIncident" ColumnName="IDTypeIncident" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Place" ColumnName="Place" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="IDStatysTypeIncident" ColumnName="IDStatysTypeIncident" />
+                <ScalarProperty Name="Responsible" ColumnName="Responsible" />
+                <ScalarProperty Name="Damage" ColumnName="Damage" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Inspection">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Inspection">
+              <MappingFragment StoreEntitySet="Inspection">
+                <ScalarProperty Name="IDInspection" ColumnName="IDInspection" />
+                <ScalarProperty Name="IDSuitcase" ColumnName="IDSuitcase" />
+                <ScalarProperty Name="Inspector" ColumnName="Inspector" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="IDTypeInspection" ColumnName="IDTypeInspection" />
+                <ScalarProperty Name="IDResult" ColumnName="IDResult" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Conclusion" ColumnName="Conclusion" />
+                <ScalarProperty Name="PhotoEvidence" ColumnName="PhotoEvidence" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Level">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Level">
+              <MappingFragment StoreEntitySet="Level">
+                <ScalarProperty Name="IDLevel" ColumnName="IDLevel" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Result">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Result">
+              <MappingFragment StoreEntitySet="Result">
+                <ScalarProperty Name="IDResult" ColumnName="IDResult" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Roles">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Roles">
+              <MappingFragment StoreEntitySet="Roles">
+                <ScalarProperty Name="IDRoles" ColumnName="IDRoles" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Statys">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Statys">
+              <MappingFragment StoreEntitySet="Statys">
+                <ScalarProperty Name="IDStatys" ColumnName="IDStatys" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StatysFlight">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.StatysFlight">
+              <MappingFragment StoreEntitySet="StatysFlight">
+                <ScalarProperty Name="IDStatysFlight" ColumnName="IDStatysFlight" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StatysTracking">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.StatysTracking">
+              <MappingFragment StoreEntitySet="StatysTracking">
+                <ScalarProperty Name="IDStatysTracking" ColumnName="IDStatysTracking" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StatysTypeIncident">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.StatysTypeIncident">
+              <MappingFragment StoreEntitySet="StatysTypeIncident">
+                <ScalarProperty Name="IDStatysTypeIncident" ColumnName="IDStatysTypeIncident" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Suitcase">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Suitcase">
+              <MappingFragment StoreEntitySet="Suitcase">
+                <ScalarProperty Name="IDSuitcase" ColumnName="IDSuitcase" />
+                <ScalarProperty Name="QRKod" ColumnName="QRKod" />
+                <ScalarProperty Name="Owner" ColumnName="Owner" />
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="Colour" ColumnName="Colour" />
+                <ScalarProperty Name="Matireal" ColumnName="Matireal" />
+                <ScalarProperty Name="Weight" ColumnName="Weight" />
+                <ScalarProperty Name="IDDegreeDanger" ColumnName="IDDegreeDanger" />
+                <ScalarProperty Name="SignDanger" ColumnName="SignDanger" />
+                <ScalarProperty Name="IDStatys" ColumnName="IDStatys" />
+                <ScalarProperty Name="DateReg" ColumnName="DateReg" />
+                <ScalarProperty Name="Last_Up" ColumnName="Last_Up" />
+                <ScalarProperty Name="Photo" ColumnName="Photo" />
+                <ScalarProperty Name="Features" ColumnName="Features" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tracking">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.Tracking">
+              <MappingFragment StoreEntitySet="Tracking">
+                <ScalarProperty Name="IDTracking" ColumnName="IDTracking" />
+                <ScalarProperty Name="IDSuitcase" ColumnName="IDSuitcase" />
+                <ScalarProperty Name="IDFlight" ColumnName="IDFlight" />
+                <ScalarProperty Name="Coordinate" ColumnName="Coordinate" />
+                <ScalarProperty Name="IDStatysTracking" ColumnName="IDStatysTracking" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="Scanned" ColumnName="Scanned" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TypeIncident">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.TypeIncident">
+              <MappingFragment StoreEntitySet="TypeIncident">
+                <ScalarProperty Name="IDTypeIncident" ColumnName="IDTypeIncident" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TypeInspection">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.TypeInspection">
+              <MappingFragment StoreEntitySet="TypeInspection">
+                <ScalarProperty Name="IDTypeInspection" ColumnName="IDTypeInspection" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User">
+            <EntityTypeMapping TypeName="SuitcaseRegistryModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="IDUser" ColumnName="IDUser" />
+                <ScalarProperty Name="FIO" ColumnName="FIO" />
+                <ScalarProperty Name="IDRoles" ColumnName="IDRoles" />
+                <ScalarProperty Name="NumberTicet" ColumnName="NumberTicet" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Telefon" ColumnName="Telefon" />
+                <ScalarProperty Name="DateReg" ColumnName="DateReg" />
+                <ScalarProperty Name="DateExit" ColumnName="DateExit" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

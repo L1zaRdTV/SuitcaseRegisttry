@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="f72f23f3c8fe43d6a4b04427f6b32104" Name="Diagram1" ZoomLevel="77">
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.BaggageRegistration" Width="1.5" PointX="5.25" PointY="16.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.BlackList" Width="1.5" PointX="8.25" PointY="16.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.CICategory" Width="1.5" PointX="3" PointY="8.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.ConfiscatedItem" Width="1.5" PointX="5.25" PointY="11.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.DegreeDanger" Width="1.5" PointX="9" PointY="21.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.DegreeProhibition" Width="1.5" PointX="3" PointY="11.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Flight" Width="1.5" PointX="5.25" PointY="21.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Incident" Width="1.5" PointX="13.5" PointY="18.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Inspection" Width="1.5" PointX="8.25" PointY="11.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Level" Width="1.5" PointX="6" PointY="26.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Result" Width="1.5" PointX="6" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Roles" Width="1.5" PointX="0.75" PointY="17.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Statys" Width="1.5" PointX="9" PointY="23.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.StatysFlight" Width="1.5" PointX="3" PointY="22.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.StatysTracking" Width="1.5" PointX="14.25" PointY="15.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.StatysTypeIncident" Width="1.5" PointX="11.25" PointY="22.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Suitcase" Width="1.5" PointX="11.25" PointY="15.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.Tracking" Width="1.5" PointX="16.5" PointY="18.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.TypeIncident" Width="1.5" PointX="11.25" PointY="24.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.TypeInspection" Width="1.5" PointX="6" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SuitcaseRegistryModel.User" Width="1.5" PointX="3" PointY="15.75" IsExpanded="true" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_BaggageRegistration_Flight" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_BaggageRegistration_Suitcase" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_BaggageRegistration_User" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_BaggageRegistration_User1" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_BlackList_Level" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_BlackList_Suitcase" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_BlackList_User" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_BlackList_User1" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_ConfiscatedItem_CICategory" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_ConfiscatedItem_DegreeProhibition" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_ConfiscatedItem_Suitcase" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_ConfiscatedItem_User" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Suitcase_DegreeDanger" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Flight_StatysFlight" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Flight_User" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Incident_Flight" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Tracking_Flight" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Incident_StatysTypeIncident" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Incident_Suitcase" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Incident_TypeIncident" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Incident_User" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Inspection_Result" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Inspection_Suitcase" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Inspection_TypeInspection" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Inspection_User" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_User_Roles" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Suitcase_Statys" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Tracking_StatysTracking" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Suitcase_User" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Tracking_Suitcase" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Tracking_User" ManuallyRouted="false" />
+        <AssociationConnector Association="SuitcaseRegistryModel.FK_Tracking_User1" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
