@@ -4,107 +4,268 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
-      d:DesignHeight="540" d:DesignWidth="960"
-      Title="Реестр чемоданов">
+      d:DesignHeight="700" d:DesignWidth="1200"
+      Title="Suitcase Registry">
 
-    <Grid Background="White" Margin="14">
+    <Page.Resources>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#2E5BFF"/>
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#F4F7FF"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="White"/>
+        <SolidColorBrush x:Key="TextMainBrush" Color="#1D2433"/>
+        <SolidColorBrush x:Key="TextSubBrush" Color="#6D7688"/>
+
+        <Style TargetType="TextBlock" x:Key="HeaderText">
+            <Setter Property="Foreground" Value="{StaticResource TextMainBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="PrimaryButton">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="GhostButton">
+            <Setter Property="Background" Value="#EEF2FF"/>
+            <Setter Property="Foreground" Value="#2841A7"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
+            <Setter Property="BorderBrush" Value="#D6E0FF"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style TargetType="Border" x:Key="CardBorder">
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="BorderBrush" Value="#E2E8F8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border BorderBrush="#D9D9D9" BorderThickness="1" Padding="12" CornerRadius="6">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="Имя:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                <TextBox x:Name="txtLoginName" Width="180" Margin="0,0,10,0"/>
+        <Border Background="#112042" Padding="16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Роль:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                <ComboBox x:Name="cbRole" Width="150" Margin="0,0,10,0">
-                    <ComboBoxItem Content="Passenger" IsSelected="True"/>
-                    <ComboBoxItem Content="Inspector"/>
-                    <ComboBoxItem Content="Logistician"/>
-                </ComboBox>
+                <StackPanel>
+                    <TextBlock Text="Реестр чемоданов — магический аэропорт" Foreground="White" FontSize="24" FontWeight="Bold"/>
+                    <TextBlock Text="Личный кабинет пассажира / рабочие панели инспектора и логиста" Foreground="#B7C4E6" FontSize="13"/>
+                </StackPanel>
 
-                <Button Content="Войти" Width="110" Click="BtnLogin_Click" Background="#2F6FED" Foreground="White"/>
-                <TextBlock x:Name="txtCurrentUser" Margin="18,0,0,0" VerticalAlignment="Center" Foreground="#4F4F4F" FontWeight="SemiBold"/>
-            </StackPanel>
+                <Border Grid.Column="1" Background="#1F2E56" CornerRadius="12" Padding="10">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="ФИО:" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBox x:Name="txtLoginName" Width="170" Margin="0,0,8,0"/>
+                        <TextBlock Text="Роль:" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <ComboBox x:Name="cbRole" Width="140" Margin="0,0,8,0">
+                            <ComboBoxItem Content="Passenger" IsSelected="True"/>
+                            <ComboBoxItem Content="Inspector"/>
+                            <ComboBoxItem Content="Logistician"/>
+                        </ComboBox>
+                        <Button Content="Войти" Style="{StaticResource PrimaryButton}" Click="BtnLogin_Click" Margin="0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Border>
 
-        <Grid Grid.Row="1" Margin="0,14,0,0">
-            <Grid.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Background" Value="#2F6FED"/>
-                    <Setter Property="Foreground" Value="White"/>
-                    <Setter Property="Padding" Value="10,5"/>
-                    <Setter Property="Margin" Value="0,6,6,0"/>
-                </Style>
-            </Grid.Resources>
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <StackPanel x:Name="PassengerPanel" Visibility="Collapsed">
-                <TextBlock Text="Пассажир" FontSize="20" FontWeight="Bold" Margin="0,0,0,8"/>
+            <Border Style="{StaticResource CardBorder}">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Left">
+                        <TextBlock x:Name="txtWelcome" FontSize="20" Style="{StaticResource HeaderText}" Text="Добро пожаловать!"/>
+                        <TextBlock x:Name="txtTicket" Foreground="{StaticResource TextSubBrush}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="txtCurrentUser" DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="#29408F" FontWeight="Bold"/>
+                </DockPanel>
+            </Border>
 
-                <WrapPanel Margin="0,0,0,8">
-                    <TextBox x:Name="txtModel" Width="120" Margin="0,0,8,0" ToolTip="Model"/>
-                    <TextBox x:Name="txtColour" Width="100" Margin="0,0,8,0" ToolTip="Colour"/>
-                    <TextBox x:Name="txtWeight" Width="80" Margin="0,0,8,0" ToolTip="Weight"/>
-                    <TextBox x:Name="txtDanger" Width="110" Margin="0,0,8,0" ToolTip="IDDegreeDanger"/>
-                    <Button Content="Добавить чемодан" Click="BtnAddSuitcase_Click"/>
-                    <Button Content="Отследить" Click="BtnTrackPassenger_Click"/>
-                </WrapPanel>
+            <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0">
+                <TabItem Header="Пассажир" x:Name="PassengerTab" Visibility="Collapsed">
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="340"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                <DataGrid x:Name="dgPassenger" Height="260" AutoGenerateColumns="False" IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding IDSuitcase}" Width="55"/>
-                        <DataGridTextColumn Header="QR" Binding="{Binding QRKod}" Width="*"/>
-                        <DataGridTextColumn Header="Модель" Binding="{Binding Model}" Width="130"/>
-                        <DataGridTextColumn Header="Статус" Binding="{Binding StatusName}" Width="150"/>
-                        <DataGridTemplateColumn Header="Цвет" Width="70">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border Width="16" Height="16" Background="{Binding StatusColor}" CornerRadius="8" HorizontalAlignment="Center"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-                <ListBox x:Name="lbPassengerTrack" Height="120" Margin="0,8,0,0"/>
-            </StackPanel>
+                        <StackPanel>
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="Зарегистрировать новый чемодан" Style="{StaticResource HeaderText}" FontSize="17" Margin="0,0,0,10"/>
+                                    <TextBox x:Name="txtModel" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" ToolTip="Модель"/>
+                                    <TextBox x:Name="txtColour" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" ToolTip="Цвет"/>
+                                    <TextBox x:Name="txtWeight" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" ToolTip="Вес"/>
+                                    <TextBox x:Name="txtDanger" Margin="0,0,0,8" Height="32" VerticalContentAlignment="Center" ToolTip="Уровень опасности"/>
+                                    <Button Content="Зарегистрировать новый чемодан" Style="{StaticResource PrimaryButton}" Click="BtnAddSuitcase_Click"/>
+                                    <Button Content="Отследить выбранный" Style="{StaticResource GhostButton}" Click="BtnTrackPassenger_Click"/>
+                                    <Button Content="Сообщить о проблеме" Style="{StaticResource GhostButton}" Click="BtnPassengerReportProblem_Click"/>
+                                </StackPanel>
+                            </Border>
 
-            <StackPanel x:Name="InspectorPanel" Visibility="Collapsed">
-                <TextBlock Text="Инспектор" FontSize="20" FontWeight="Bold" Margin="0,0,0,8"/>
-                <WrapPanel>
-                    <Button Content="Досмотр" Click="BtnInspect_Click"/>
-                    <TextBox x:Name="txtConfiscateSubject" Width="200" Margin="0,6,8,0" ToolTip="Что конфисковать"/>
-                    <Button Content="Конфисковать" Click="BtnConfiscate_Click"/>
-                </WrapPanel>
-                <DataGrid x:Name="dgInspector" Margin="0,8,0,0" AutoGenerateColumns="False" IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding IDSuitcase}" Width="55"/>
-                        <DataGridTextColumn Header="QR" Binding="{Binding QRKod}" Width="*"/>
-                        <DataGridTextColumn Header="Опасность" Binding="{Binding IDDegreeDanger}" Width="90"/>
-                        <DataGridTextColumn Header="Статус" Binding="{Binding StatusName}" Width="160"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </StackPanel>
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="История инцидентов" Style="{StaticResource HeaderText}" FontSize="16" Margin="0,0,0,8"/>
+                                    <ListBox x:Name="lbPassengerIncidents" Height="240"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-            <StackPanel x:Name="LogisticPanel" Visibility="Collapsed">
-                <TextBlock Text="Логист" FontSize="20" FontWeight="Bold" Margin="0,0,0,8"/>
-                <WrapPanel>
-                    <TextBox x:Name="txtSearchLost" Width="180" Margin="0,0,8,0" ToolTip="Поиск по QR"/>
-                    <Button Content="Поиск" Click="BtnSearchLost_Click"/>
-                    <TextBox x:Name="txtCoordinate" Width="220" Margin="0,6,8,0" ToolTip="Новая координата"/>
-                    <Button Content="Обновить местоположение" Click="BtnUpdateTracking_Click"/>
-                    <Button Content="Записать инцидент" Click="BtnAddIncident_Click"/>
-                </WrapPanel>
-                <DataGrid x:Name="dgLost" Margin="0,8,0,0" AutoGenerateColumns="False" IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding IDSuitcase}" Width="55"/>
-                        <DataGridTextColumn Header="QR" Binding="{Binding QRKod}" Width="*"/>
-                        <DataGridTextColumn Header="Владелец" Binding="{Binding Owner}" Width="90"/>
-                        <DataGridTextColumn Header="Статус" Binding="{Binding StatusName}" Width="150"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </StackPanel>
+                        <Grid Grid.Column="1" Margin="12,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="330"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="Мои чемоданы" Style="{StaticResource HeaderText}" FontSize="17" Margin="0,0,0,8"/>
+                                    <ListBox x:Name="lbPassengerSuitcases" SelectionChanged="lbPassengerSuitcases_SelectionChanged" BorderThickness="0" Background="Transparent">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#F9FBFF" CornerRadius="10" BorderBrush="#D9E5FF" BorderThickness="1" Padding="10" Margin="0,0,0,8">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="90"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="180"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Width="72" Height="72" CornerRadius="8" Background="#E8EEFF" VerticalAlignment="Center">
+                                                            <TextBlock Text="🧳" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                                            <TextBlock Text="{Binding Model}" FontWeight="SemiBold" FontSize="15"/>
+                                                            <TextBlock Text="{Binding Colour, StringFormat=Цвет: {0}}" Foreground="#5B6476"/>
+                                                            <TextBlock Text="{Binding QRKod, StringFormat=QR: {0}}" Foreground="#5B6476"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2">
+                                                            <Border Background="{Binding StatusColor}" CornerRadius="8" Padding="8,3" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                                                <TextBlock Text="{Binding StatusName}" Foreground="White" FontSize="12"/>
+                                                            </Border>
+                                                            <Button Content="Показать QR / Track" Style="{StaticResource GhostButton}" Tag="{Binding}" Click="BtnTrackPassenger_Click"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Row="1" Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="Трекинг чемодана (таймлайн)" Style="{StaticResource HeaderText}" FontSize="16" Margin="0,0,0,8"/>
+                                    <ListBox x:Name="lbPassengerTrack"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Инспектор" x:Name="InspectorTab" Visibility="Collapsed">
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Чемоданы на досмотр" Style="{StaticResource HeaderText}" FontSize="17" Margin="0,0,0,8"/>
+                                <DataGrid x:Name="dgInspector" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" Height="460">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding IDSuitcase}" Width="55"/>
+                                        <DataGridTextColumn Header="QR" Binding="{Binding QRKod}" Width="*"/>
+                                        <DataGridTextColumn Header="Модель" Binding="{Binding Model}" Width="130"/>
+                                        <DataGridTextColumn Header="Опасность" Binding="{Binding IDDegreeDanger}" Width="90"/>
+                                        <DataGridTextColumn Header="Статус" Binding="{Binding StatusName}" Width="180"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="Рабочие действия" Style="{StaticResource HeaderText}" FontSize="16" Margin="0,0,0,8"/>
+                                    <Button Content="Начать досмотр" Style="{StaticResource PrimaryButton}" Click="BtnInspect_Click"/>
+                                    <TextBox x:Name="txtConfiscateSubject" Height="32" Margin="0,0,0,8" VerticalContentAlignment="Center" ToolTip="Что конфисковать"/>
+                                    <Button Content="Конфисковать предмет" Style="{StaticResource GhostButton}" Click="BtnConfiscate_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="Журнал досмотров" Style="{StaticResource HeaderText}" FontSize="16" Margin="0,0,0,8"/>
+                                    <ListBox x:Name="lbInspectorJournal" Height="280"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Логист" x:Name="LogisticTab" Visibility="Collapsed">
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Поиск и сопровождение потерянного багажа" Style="{StaticResource HeaderText}" FontSize="17" Margin="0,0,0,8"/>
+                                <WrapPanel Margin="0,0,0,8">
+                                    <TextBox x:Name="txtSearchLost" Width="240" Height="32" Margin="0,0,8,8" VerticalContentAlignment="Center" ToolTip="Поиск по QR"/>
+                                    <Button Content="Поиск" Style="{StaticResource GhostButton}" Click="BtnSearchLost_Click"/>
+                                </WrapPanel>
+                                <DataGrid x:Name="dgLost" AutoGenerateColumns="False" IsReadOnly="True" Height="430">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ID" Binding="{Binding IDSuitcase}" Width="55"/>
+                                        <DataGridTextColumn Header="QR" Binding="{Binding QRKod}" Width="*"/>
+                                        <DataGridTextColumn Header="Модель" Binding="{Binding Model}" Width="130"/>
+                                        <DataGridTextColumn Header="Владелец" Binding="{Binding OwnerName}" Width="180"/>
+                                        <DataGridTextColumn Header="Статус" Binding="{Binding StatusName}" Width="160"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="Управление трекингом" Style="{StaticResource HeaderText}" FontSize="16" Margin="0,0,0,8"/>
+                                    <TextBox x:Name="txtCoordinate" Height="32" Margin="0,0,0,8" VerticalContentAlignment="Center" ToolTip="Новое местоположение"/>
+                                    <Button Content="Обновить местоположение" Style="{StaticResource PrimaryButton}" Click="BtnUpdateTracking_Click"/>
+                                    <Button Content="Записать инцидент" Style="{StaticResource GhostButton}" Click="BtnAddIncident_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardBorder}">
+                                <StackPanel>
+                                    <TextBlock Text="Последние отметки" Style="{StaticResource HeaderText}" FontSize="16" Margin="0,0,0,8"/>
+                                    <ListBox x:Name="lbLogisticTimeline" Height="260"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+            </TabControl>
         </Grid>
     </Grid>
 </Page>
